@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">運動記録カレンダー</string>
+    <string name="calendar">カレンダー</string>
+    <string name="graph">グラフ</string>
+    <string name="user">ユーザー</string>
+</resources>
