@@ -1,4 +1,4 @@
-package jp.ac.it_college.std.s23018.recordingcalendar.ui.user
+package jp.ac.it_college.std.s23018.recordingcalendar.ui.graph
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,18 +8,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun UserScreen(
+fun GraphScreen(
     modifier: Modifier = Modifier,
-){
+) {
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier
+            .fillMaxSize()
     ) {
-       Text(text = "ユーザー情報")
+        Text("グラフ画面" )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun UserScrrenPreview() {
-    UserScreen()
+private fun GraphScreenPreview(){
+    GraphScreen()
 }
