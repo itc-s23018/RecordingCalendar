@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import jp.ac.it_college.std.s23018.recordingcalendar.R
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.calendar.CalendarScreen
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.graph.GraphScreen
@@ -25,7 +26,8 @@ import org.w3c.dom.Text as Text1
 
 @Composable
 fun TabRowScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController,
 ){
     var tabIndex by remember { mutableStateOf(0) }
 
@@ -47,7 +49,9 @@ fun TabRowScreen(
         ) {
             // 選択されたタブに応じた画面を表示
             when (tabIndex) {
-                0 -> CalendarScreen() // カレンダー画面
+                0 -> CalendarScreen(
+                    navController = navController
+                )// カレンダー画面
                 1 -> GraphScreen() // グラフ画面
                 2 -> UserScreen() // ユーザー画面
             }

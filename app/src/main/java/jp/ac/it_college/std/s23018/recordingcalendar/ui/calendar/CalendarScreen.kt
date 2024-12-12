@@ -16,14 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
 import jp.ac.it_college.std.s23018.recordingcalendar.R
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.RecordingCalendarAppBar
+import jp.ac.it_college.std.s23018.recordingcalendar.ui.tab.TabRowScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(
     navigateRecordEntry: () -> Unit = {},
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -36,17 +39,16 @@ fun CalendarScreen(
     ) { innerPading ->
         Button(
             onClick = {
-                navigateRecordEntry
-            }, modifier = Modifier.padding(innerPading)
+                navController.navigate("record")
+            },modifier = Modifier.padding(innerPading)
         ) {
             Text(text = "記録画面を開くテスト")
         }
     }
-
 }
 
-@Preview
-@Composable
-private fun CalendarScrennPreview() {
-    CalendarScreen()
-}
+//@Preview
+//@Composable
+//private fun CalendarScrennPreview() {
+//    CalendarScreen()
+//}

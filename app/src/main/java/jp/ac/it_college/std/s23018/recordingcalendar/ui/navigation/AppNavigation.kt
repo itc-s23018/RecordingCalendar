@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.calendar.CalendarScreen
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.record.RecordScreen
+import jp.ac.it_college.std.s23018.recordingcalendar.ui.tab.TabRowScreen
 
 @Composable
 fun AppNavigation() {
@@ -13,11 +14,16 @@ fun AppNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = "calendar"
+        startDestination = "tabRow"
     ) {
+        composable("tabRow"){
+            TabRowScreen(
+                navController = navController
+            )
+        }
         composable("calendar") {
             CalendarScreen(
-                navigateRecordEntry = { navController.navigate("record") }
+                navController = navController
             )
         }
         composable("record") {
