@@ -10,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.rememberCoroutineScope
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.UserEntity
+import jp.ac.it_college.std.s23018.recordingcalendar.ui.navigation.AppNavigation
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.theme.RecordingCalendarTheme
 import kotlinx.coroutines.launch
 
@@ -19,7 +20,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
            RecordingCalendarTheme {
-//               AppNavigation()
+               AppNavigation()
 
                Surface {
                    val coroutineScope = rememberCoroutineScope()
