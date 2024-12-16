@@ -5,20 +5,25 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,24 +51,37 @@ fun CalendarScreen(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-
     // 現在の日付を取得
     val currentCalendar = Calendar.getInstance()
     val initialYear = currentCalendar.get(Calendar.YEAR)
-    val initialMouth = currentCalendar.get(Calendar.MONTH) + 1
+    val initialMonth = currentCalendar.get(Calendar.MONTH) + 1
 
-    var currentYear by remember { mutableStateOf(initialYear)}
-    var currentMonth by remember { mutableStateOf(initialMouth) }
+    var currentYear by remember { mutableStateOf(initialYear) }
+    var currentMonth by remember { mutableStateOf(initialMonth) }
 
-    val currentLocal = Locale.getDefault()
-    val isEnglish = currentLocal.language == "en"
+    // システムのロケールを取得
+    val currentLocale = Locale.getDefault()
+    val isEnglish = currentLocale.language == "en"
 
-    val weekDays = if(isEnglish){
-       DateFormatSymbols().shortWeekdays.filter { it.isNotEmpty() }
+    // 曜日のリストを取得（英語なら3文字、その他は1文字）
+    val weekDays = if (isEnglish) {
+        // 英語の場合、曜日を3文字に設定
+        DateFormatSymbols().shortWeekdays.filter { it.isNotEmpty() }
     } else {
-        listOf("日","月","火","水","木","金","土")
+        // 日本語の場合、曜日を1文字に設定
+        listOf("日", "月", "火", "水", "木", "金", "土")
     }
 
+    // 現在の月のカレンダーを取得
+    val calendar = Calendar.getInstance()
+    calendar.set(Calendar.YEAR, currentYear)
+    calendar.set(Calendar.MONTH, currentMonth - 1)
+    calendar.set(Calendar.DAY_OF_MONTH, 1)
+
+    // 月の最初の日の曜日を取得
+    val firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+    // 月の日数を取得
+    val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
 
     Scaffold(
         topBar = {
@@ -79,17 +97,21 @@ fun CalendarScreen(
             }
         }
     ) { innerPadding ->
+        // 全画面に対応するColumn
         Column(
             modifier = modifier
+                .fillMaxSize() // 画面全体に広げる
                 .padding(innerPadding)
-                .padding(20.dp)
+                .padding(16.dp)
         ) {
+            // 年月切り替え部分
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(onClick = {
+                // 前の月へ
+                IconButton(onClick = {
                     if (currentMonth == 1) {
                         currentMonth = 12
                         currentYear -= 1
@@ -99,19 +121,23 @@ fun CalendarScreen(
                 }) {
                     Icon(
                         imageVector = Icons.Default.ChevronLeft,
-                        contentDescription = "Future Month"
+                        contentDescription = "前の月"
                     )
                 }
+
+                // 現在の年月
                 Text(
                     text = "$currentYear 年 $currentMonth 月",
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = 25.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     ),
                     modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                Button(onClick = {
-                    if(currentMonth == 12) {
+                )
+
+                // 次の月へ
+                IconButton(onClick = {
+                    if (currentMonth == 12) {
                         currentMonth = 1
                         currentYear += 1
                     } else {
@@ -120,11 +146,12 @@ fun CalendarScreen(
                 }) {
                     Icon(
                         imageVector = Icons.Default.ChevronRight,
-                        contentDescription = "Next Month"
+                        contentDescription = "次の月"
                     )
                 }
             }
 
+            // 曜日表示
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -144,25 +171,85 @@ fun CalendarScreen(
                             color = textColor
                         ),
                         modifier = Modifier
-                            .weight(1f) // 曜日を均等に配置
-                            .padding(4.dp),
-                        textAlign = TextAlign.Center
+                            .padding(4.dp)
+                            .weight(1f), // 各曜日を均等に配置
+                        textAlign = TextAlign.Center // 中央揃え
                     )
                 }
             }
 
+            // 日付の表示（カレンダーの中身）
+            Spacer(modifier = Modifier.height(8.dp))
+            val daysInWeek = 7
+            val emptySlots = firstDayOfWeek - 1 // 最初の日曜日まで空のスペース
 
+            // 日付を縦に並べる
+            Column(
+                modifier = Modifier.fillMaxHeight(0.6f) // 日付部分の高さ調整
+            ) {
+                // 1週間ごとに表示
+                for (week in 0..5) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        // 1週間の日付を表示
+                        for (day in 1..daysInWeek) {
+                            val currentDay = week * daysInWeek + (day - emptySlots)
+                            if (currentDay in 1..daysInMonth) {
+                                val textColor = when {
+                                    (day == 1) -> Color.Red   // 日曜日
+                                    (day == 7) -> Color.Blue  // 土曜日
+                                    else -> Color.Black
+                                }
+                                Text(
+                                    text = currentDay.toString(),
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontSize = 23.sp,  // 大きさを調整
+                                        color = textColor
+                                    ),
+                                    modifier = Modifier
+                                        .padding(12.dp) // 余白を大きく設定
+                                        .width(40.dp) // 固定幅を設定して横並びに調整
+                                        .weight(1f), // 各日付を均等に配置
+                                    textAlign = TextAlign.Center
+                                )
+                            } else {
+                                Spacer(modifier = Modifier.weight(1f)) // 空白部分
+                            }
+                        }
+                    }
+
+                    // 各行間のスペースを調整（縦方向）
+                    if (week * daysInWeek + emptySlots < daysInMonth) {
+                        Spacer(modifier = Modifier.height(25.dp)) // 行間のスペース
+                    }
+
+                    if (week * daysInWeek + emptySlots >= daysInMonth) {
+                        break
+                    }
+                }
+            }
+
+            // 年月切り替えとボタンの間隔を追加
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // 記録画面に遷移するボタン
             Button(
                 onClick = {
                     navController.navigate("record")
                 },
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth() // ボタンの幅を画面幅に合わせる
+                    .padding(16.dp)
             ) {
-                Text(text = "記録画面を開くテスト")
+                Text(text = "記録画面を開くテスト", fontSize = 16.sp)
             }
         }
     }
 }
+
+
 
 @Preview
 @Composable
