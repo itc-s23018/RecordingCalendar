@@ -1,6 +1,7 @@
 package jp.ac.it_college.std.s23018.recordingcalendar.ui.calendar
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -35,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import jp.ac.it_college.std.s23018.recordingcalendar.R
 import java.text.DateFormatSymbols
 import java.util.Calendar
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,15 +55,28 @@ fun CalendarScreen(
     var currentYear by remember { mutableStateOf(initialYear)}
     var currentMonth by remember { mutableStateOf(initialMouth) }
 
-    val weekDays = DateFormatSymbols().weekdays.filter { it.isNotEmpty() }
+    val currentLocal = Locale.getDefault()
+    val isEnglish = currentLocal.language == "en"
+
+    val weekDays = if(isEnglish){
+       DateFormatSymbols().shortWeekdays.filter { it.isNotEmpty() }
+    } else {
+        listOf("日","月","火","水","木","金","土")
+    }
+
 
     Scaffold(
         topBar = {
-            Text(
-                text = stringResource(id = R.string.calendar),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(16.dp)
-            )
+            // トップバー内でタイトルを中央配置
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(id = R.string.calendar),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.align(Alignment.Center) // 中央配置
+                )
+            }
         }
     ) { innerPadding ->
         Column(
@@ -110,32 +125,32 @@ fun CalendarScreen(
                 }
             }
 
-           Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-               weekDays.forEachIndexed { index, day ->
-                   val textColor = when(index){
-                       0 -> Color.Red
-                       6 -> Color.Blue
-                       else -> Color.Black
-                   }
-                   Text(
-                       text = day.substring(0,1),
-                       style = MaterialTheme.typography.bodyMedium.copy(
-                           fontSize = 20.sp,
-                           fontWeight = FontWeight.Bold,
-                           color = textColor
-                       ),
-                       modifier = Modifier
-                           .weight(5f)
-                           .padding(3.dp),
-                       textAlign = TextAlign.Center
-                   )
-
-               }
+                weekDays.forEachIndexed { index, day ->
+                    val textColor = when (index) {
+                        0 -> Color.Red   // 日曜日 (index 0)
+                        6 -> Color.Blue  // 土曜日 (index 6)
+                        else -> Color.Black
+                    }
+                    Text(
+                        text = day,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = textColor
+                        ),
+                        modifier = Modifier
+                            .weight(1f) // 曜日を均等に配置
+                            .padding(4.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
+
 
             Button(
                 onClick = {
