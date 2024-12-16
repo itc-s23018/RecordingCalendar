@@ -3,7 +3,9 @@ package jp.ac.it_college.std.s23018.recordingcalendar.ui.calendar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
@@ -21,14 +23,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import jp.ac.it_college.std.s23018.recordingcalendar.R
+import java.text.DateFormatSymbols
 import java.util.Calendar
 
 
@@ -47,6 +52,8 @@ fun CalendarScreen(
 
     var currentYear by remember { mutableStateOf(initialYear)}
     var currentMonth by remember { mutableStateOf(initialMouth) }
+
+    val weekDays = DateFormatSymbols().weekdays.filter { it.isNotEmpty() }
 
     Scaffold(
         topBar = {
@@ -101,6 +108,33 @@ fun CalendarScreen(
                         contentDescription = "Next Month"
                     )
                 }
+            }
+
+           Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+               weekDays.forEachIndexed { index, day ->
+                   val textColor = when(index){
+                       0 -> Color.Red
+                       6 -> Color.Blue
+                       else -> Color.Black
+                   }
+                   Text(
+                       text = day.substring(0,1),
+                       style = MaterialTheme.typography.bodyMedium.copy(
+                           fontSize = 20.sp,
+                           fontWeight = FontWeight.Bold,
+                           color = textColor
+                       ),
+                       modifier = Modifier
+                           .weight(5f)
+                           .padding(3.dp),
+                       textAlign = TextAlign.Center
+                   )
+
+               }
             }
 
             Button(
