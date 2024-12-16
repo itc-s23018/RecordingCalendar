@@ -63,7 +63,7 @@ fun CalendarScreen(
     val currentLocale = Locale.getDefault()
     val isEnglish = currentLocale.language == "en"
 
-    // 曜日のリストを取得（英語なら3文字、その他は1文字）
+    // 曜日のリストを取得
     val weekDays = if (isEnglish) {
         // 英語の場合、曜日を3文字に設定
         DateFormatSymbols().shortWeekdays.filter { it.isNotEmpty() }
@@ -84,8 +84,7 @@ fun CalendarScreen(
     val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
 
     Scaffold(
-        topBar = {
-            // トップバー内でタイトルを中央配置
+        topBar = { //トップバー
             Box(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -97,20 +96,18 @@ fun CalendarScreen(
             }
         }
     ) { innerPadding ->
-        // 全画面に対応するColumn
         Column(
             modifier = modifier
-                .fillMaxSize() // 画面全体に広げる
+                .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            // 年月切り替え部分
+            // 現在の年月
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // 前の月へ
                 IconButton(onClick = {
                     if (currentMonth == 1) {
                         currentMonth = 12
@@ -124,8 +121,6 @@ fun CalendarScreen(
                         contentDescription = "前の月"
                     )
                 }
-
-                // 現在の年月
                 Text(
                     text = "$currentYear 年 $currentMonth 月",
                     style = MaterialTheme.typography.titleMedium.copy(
@@ -134,8 +129,6 @@ fun CalendarScreen(
                     ),
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
-
-                // 次の月へ
                 IconButton(onClick = {
                     if (currentMonth == 12) {
                         currentMonth = 1
@@ -178,51 +171,47 @@ fun CalendarScreen(
                 }
             }
 
-            // 日付の表示（カレンダーの中身）
+            // 日付の表示
             Spacer(modifier = Modifier.height(8.dp))
             val daysInWeek = 7
             val emptySlots = firstDayOfWeek - 1 // 最初の日曜日まで空のスペース
 
-            // 日付を縦に並べる
             Column(
-                modifier = Modifier.fillMaxHeight(0.6f) // 日付部分の高さ調整
+                modifier = Modifier.fillMaxHeight(0.6f)
             ) {
-                // 1週間ごとに表示
                 for (week in 0..5) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        // 1週間の日付を表示
                         for (day in 1..daysInWeek) {
                             val currentDay = week * daysInWeek + (day - emptySlots)
                             if (currentDay in 1..daysInMonth) {
                                 val textColor = when {
-                                    (day == 1) -> Color.Red   // 日曜日
-                                    (day == 7) -> Color.Blue  // 土曜日
+                                    (day == 1) -> Color.Red
+                                    (day == 7) -> Color.Blue
                                     else -> Color.Black
                                 }
                                 Text(
                                     text = currentDay.toString(),
                                     style = MaterialTheme.typography.bodyMedium.copy(
-                                        fontSize = 23.sp,  // 大きさを調整
+                                        fontSize = 23.sp,
                                         color = textColor
                                     ),
                                     modifier = Modifier
-                                        .padding(12.dp) // 余白を大きく設定
-                                        .width(40.dp) // 固定幅を設定して横並びに調整
-                                        .weight(1f), // 各日付を均等に配置
+                                        .padding(12.dp)
+                                        .width(40.dp)
+                                        .weight(1f),
                                     textAlign = TextAlign.Center
                                 )
                             } else {
-                                Spacer(modifier = Modifier.weight(1f)) // 空白部分
+                                Spacer(modifier = Modifier.weight(1f))
                             }
                         }
                     }
 
-                    // 各行間のスペースを調整（縦方向）
                     if (week * daysInWeek + emptySlots < daysInMonth) {
-                        Spacer(modifier = Modifier.height(25.dp)) // 行間のスペース
+                        Spacer(modifier = Modifier.height(25.dp))
                     }
 
                     if (week * daysInWeek + emptySlots >= daysInMonth) {
@@ -231,8 +220,6 @@ fun CalendarScreen(
                 }
             }
 
-            // 年月切り替えとボタンの間隔を追加
-            Spacer(modifier = Modifier.height(32.dp))
 
             // 記録画面に遷移するボタン
             Button(
