@@ -194,7 +194,7 @@ fun CalendarScreen(
                         for (day in 1..daysInWeek) {
                             val currentDayInCell = week * daysInWeek + (day - emptySlots)
                             if (currentDayInCell in 1..daysInMonth) {
-                                val isToday = currentDayInCell == currentDay // 今日の日付かどうか
+                                val isToday = currentYear == initialYear && currentMonth == initialMonth && currentDayInCell == currentDay
                                 val textColor = when {
                                     (day == 1) -> Color.Red
                                     (day == 7) -> Color.Blue
