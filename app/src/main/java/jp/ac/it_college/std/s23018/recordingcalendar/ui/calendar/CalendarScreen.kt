@@ -1,5 +1,6 @@
 package jp.ac.it_college.std.s23018.recordingcalendar.ui.calendar
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
@@ -60,6 +62,7 @@ fun CalendarScreen(
     val currentCalendar = Calendar.getInstance()
     val initialYear = currentCalendar.get(Calendar.YEAR)
     val initialMonth = currentCalendar.get(Calendar.MONTH) + 1
+    val currentDay = currentCalendar.get(Calendar.DAY_OF_MONTH) // 今日の日付
 
     var currentYear by remember { mutableStateOf(initialYear) }
     var currentMonth by remember { mutableStateOf(initialMonth) }
@@ -94,7 +97,7 @@ fun CalendarScreen(
                 Text(
                     text = stringResource(id = R.string.calendar),
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.align(Alignment.Center) 
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
         }
@@ -147,7 +150,6 @@ fun CalendarScreen(
                 }
             }
 
-
             // 曜日表示
             Spacer(modifier = Modifier.height(8.dp))
             Row(
@@ -174,7 +176,6 @@ fun CalendarScreen(
                     )
                 }
             }
-            
 
             // 日付の表示
             Spacer(modifier = Modifier.height(8.dp))
@@ -191,25 +192,33 @@ fun CalendarScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         for (day in 1..daysInWeek) {
-                            val currentDay = week * daysInWeek + (day - emptySlots)
-                            if (currentDay in 1..daysInMonth) {
+                            val currentDayInCell = week * daysInWeek + (day - emptySlots)
+                            if (currentDayInCell in 1..daysInMonth) {
+                                val isToday = currentDayInCell == currentDay // 今日の日付かどうか
                                 val textColor = when {
                                     (day == 1) -> Color.Red
                                     (day == 7) -> Color.Blue
                                     else -> Color.Black
                                 }
                                 TextButton(
-                                    onClick = { navController.navigate("record/$currentYear/$currentMonth/$currentDay")  },
+                                    onClick = { navController.navigate("record/$currentYear/$currentMonth/$currentDayInCell") },
                                     modifier = Modifier
                                         .size(60.dp)
                                         .padding(0.5.dp)
                                         .weight(1f)
+                                        .let {
+                                            if (isToday) {
+                                                it.background(Color.Red, shape = CircleShape)
+                                            } else {
+                                                it
+                                            }
+                                        }
                                 ) {
                                     Text(
-                                        text = currentDay.toString(),
+                                        text = currentDayInCell.toString(),
                                         style = MaterialTheme.typography.bodyMedium.copy(
                                             fontSize = 25.sp,
-                                            color = textColor,
+                                            color = if(isToday) Color.White else textColor,
                                         )
                                     )
                                 }
@@ -231,6 +240,7 @@ fun CalendarScreen(
         }
     }
 }
+
 
 
 
