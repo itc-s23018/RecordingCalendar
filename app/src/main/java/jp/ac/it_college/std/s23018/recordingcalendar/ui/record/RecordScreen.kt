@@ -56,8 +56,8 @@ fun RecordScreen(
                 val coroutineScope = rememberCoroutineScope()
                 val app = navController.context.applicationContext as RecordingCalendarApplication
                 val db = app.container.recordRepository
-                val weight = WeightEntity("2024-12-13", 64.5f)
-                val motion = MotionEntity("2024-12-13", "Running", 30)
+                val weight = WeightEntity("$selectedYear-$selectedMonth-$selectedDay", 64.0f)
+                val motion = MotionEntity("$selectedYear-$selectedMonth-$selectedDay", "Strength training", 45)
 
                 Button(
                     onClick = {
