@@ -28,6 +28,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun RecordScreen(
     navController: NavController,
+    selectedYear: String,
+    selectedMonth: String,
+    selectedDay: String,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -47,6 +50,7 @@ fun RecordScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(text = "記録画面")
+                Text(text = "$selectedYear 年 $selectedMonth 月 $selectedDay 日")
 
                 // ボタンを追加して、データベースへのデータ挿入を試す
                 val coroutineScope = rememberCoroutineScope()
@@ -81,8 +85,8 @@ fun RecordScreen(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-private fun RecordScreenPreview(){
-    RecordScreen(rememberNavController())
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun RecordScreenPreview(){
+//    RecordScreen(rememberNavController())
+//}

@@ -199,7 +199,7 @@ fun CalendarScreen(
                                     else -> Color.Black
                                 }
                                 TextButton(
-                                    onClick = { navController.navigate("record")  },
+                                    onClick = { navController.navigate("record/$currentYear/$currentMonth/$currentDay")  },
                                     modifier = Modifier
                                         .size(60.dp)
                                         .padding(0.5.dp)

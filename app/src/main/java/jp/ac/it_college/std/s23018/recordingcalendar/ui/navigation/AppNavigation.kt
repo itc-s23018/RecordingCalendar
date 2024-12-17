@@ -9,7 +9,8 @@ import jp.ac.it_college.std.s23018.recordingcalendar.ui.record.RecordScreen
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.tab.TabRowScreen
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+) {
     val navController = rememberNavController()
 
     NavHost(
@@ -26,9 +27,15 @@ fun AppNavigation() {
                 navController = navController
             )
         }
-        composable("record") {
+        composable("record/{selectedYear}/{selectedMonth}/{selectedDay}") { backStackEntry ->
+            val selectedYear = backStackEntry.arguments?.getString("selectedYear")
+            val selectedMonth = backStackEntry.arguments?.getString("selectedMonth")
+            val selectedDay = backStackEntry.arguments?.getString("selectedDay")
             RecordScreen(
-                navController = navController
+                navController = navController,
+                selectedYear = selectedYear ?: "未選択",
+                selectedMonth = selectedMonth ?: "未選択",
+                selectedDay = selectedDay ?: "未選択",
             )
         }
     }
