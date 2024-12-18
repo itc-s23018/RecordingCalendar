@@ -18,10 +18,11 @@ class RecordRepositoryImpl @Inject constructor(
 
     override suspend fun updateMotion(motion: MotionEntity) = dao.motionUpdate(motion)
 
-//    override suspend fun getWeightByDate(weight: WeightEntity) = dao.getWeightByDate(date = )
-//
-//    override suspend fun getMotionByDate(motion: MotionEntity) = dao.getMotionByDate(date = )
-//
+    override suspend fun getWeightByDate(date: String): WeightEntity? = dao.getWeightByDate(date)
+
+    override suspend fun getMotionByDate(date: String): MotionEntity?  = dao.getMotionByDate(date)
+
+
 //    override suspend fun getWeeklyWeights(weight: WeightEntity) = dao.getWeeklyWeights(startDate = , endDate = )
 //
 //    override suspend fun getMonthlyWeights(weight: WeightEntity) = dao.getMonthlyWeights(startDate = , endDate = )

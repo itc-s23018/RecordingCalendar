@@ -23,11 +23,10 @@ interface RecordDao {
     suspend fun motionUpdate(motion: MotionEntity)
 
     @Query("SELECT * FROM weight WHERE date = :date") //体重記録表示(記録画面&カレンダー画面）
-    fun getWeightByDate(date: String): Flow<WeightEntity?>
-
+    fun getWeightByDate(date: String): WeightEntity?
 
     @Query("SELECT * FROM motion WHERE date = :date") //運動記録表示(記録画面&カレンダー画面）
-    fun getMotionByDate(date: String): Flow<List<MotionEntity>>
+    fun getMotionByDate(date: String): MotionEntity?
 
     @Query("SELECT * FROM weight WHERE date BETWEEN :startDate AND :endDate ORDER BY date ASC")//１週間グラフの体重記録表示
     fun getWeeklyWeights(startDate: String, endDate: String): Flow<List<WeightEntity>>

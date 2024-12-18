@@ -10,8 +10,8 @@ interface RecordRepository {
     suspend fun updateWeight(weight:WeightEntity)
     suspend fun updateMotion(motion:MotionEntity)
 
-//    suspend fun getWeightByDate(weight:WeightEntity)
-//    suspend fun getMotionByDate(motion:MotionEntity)
+    suspend fun getWeightByDate(date: String):WeightEntity?
+    suspend fun getMotionByDate(date: String): MotionEntity?
 
 //    suspend fun getWeeklyWeights(weight: WeightEntity)
 //    suspend fun getMonthlyWeights(weight: WeightEntity)
