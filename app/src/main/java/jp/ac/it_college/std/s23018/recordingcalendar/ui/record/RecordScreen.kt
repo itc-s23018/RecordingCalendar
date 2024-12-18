@@ -69,6 +69,10 @@ fun RecordScreen(
         mutableStateOf<WeightEntity?>(null)
     }
 
+    var motionRecord by remember {
+        mutableStateOf<MotionEntity?>(null)
+    }
+
     val app = navController.context.applicationContext as RecordingCalendarApplication
     val db = app.container.recordRepository
 
@@ -79,7 +83,12 @@ fun RecordScreen(
         val weightData = withContext(Dispatchers.IO){
             db.getWeightByDate(selectedDate.toString())
         }
+
+        val motionData = withContext(Dispatchers.IO){
+            db.getMotionByDate(selectedDate.toString())
+        }
         weightRecord = weightData
+        motionRecord = motionData
     }
 
     Scaffold(
@@ -134,7 +143,7 @@ fun RecordScreen(
                     Text(
                         text = "体重: ${it.weight}kg",
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 15.sp,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         ),
                         modifier = Modifier.padding(top = 16.dp)
@@ -143,7 +152,7 @@ fun RecordScreen(
                     Text(
                         text = "体重: 記録なし",
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 15.sp,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         ),
                         modifier = Modifier.padding(top = 16.dp)
@@ -164,6 +173,26 @@ fun RecordScreen(
                     modifier = Modifier.padding(vertical = 8.dp)
                 ) {
                     Text(text = "体重を登録")
+                }
+
+                motionRecord?.let {
+                    Text(
+                        text = "運動記録:${it.motion} ${it.time}分",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                } ?: run {
+                    Text(
+                        text = "運動記録: なし",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
                 }
 
                 Button(
