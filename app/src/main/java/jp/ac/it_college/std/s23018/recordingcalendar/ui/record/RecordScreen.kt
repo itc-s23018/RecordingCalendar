@@ -96,7 +96,7 @@ fun RecordScreen(
             RecordingCalendarAppBar(
                 title = stringResource(id = R.string.record),
                 canNavigationBack = true,
-                navigateUp = { navController.navigateUp() }
+                navigateUp = { navController.navigate("calendar") }
             )
         },
         content = {
