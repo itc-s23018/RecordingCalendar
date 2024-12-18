@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,7 +38,9 @@ import jp.ac.it_college.std.s23018.recordingcalendar.RecordingCalendarApplicatio
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.RecordingCalendarAppBar
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -62,6 +65,23 @@ fun RecordScreen(
         )
     }
 
+    var weightRecord by remember {
+        mutableStateOf<WeightEntity?>(null)
+    }
+
+    val app = navController.context.applicationContext as RecordingCalendarApplication
+    val db = app.container.recordRepository
+
+    val coroutineScope = rememberCoroutineScope()
+
+
+    LaunchedEffect(selectedDate) {
+        val weightData = withContext(Dispatchers.IO){
+            db.getWeightByDate(selectedDate.toString())
+        }
+        weightRecord = weightData
+    }
+
     Scaffold(
         topBar = {
             RecordingCalendarAppBar(
@@ -74,8 +94,7 @@ fun RecordScreen(
             Column(
                 modifier = modifier
                     .fillMaxSize()
-                    .padding(start = 16.dp, end = 16.dp, top = 100.dp)
-                ,
+                    .padding(start = 16.dp, end = 16.dp, top = 100.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
@@ -84,7 +103,6 @@ fun RecordScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // 前の日ボタン
                     IconButton(onClick = {
                         selectedDate = selectedDate.minusDays(1)
                     }) {
@@ -103,7 +121,7 @@ fun RecordScreen(
                     )
 
                     IconButton(onClick = {
-                        selectedDate = selectedDate.plusDays(1) // 日付を1日後に変更
+                        selectedDate = selectedDate.plusDays(1)
                     }) {
                         Icon(
                             imageVector = Icons.Default.ChevronRight,
@@ -112,12 +130,25 @@ fun RecordScreen(
                     }
                 }
 
-
-
-                val coroutineScope = rememberCoroutineScope()
-                val app = navController.context.applicationContext as RecordingCalendarApplication
-                val db = app.container.recordRepository
-
+                weightRecord?.let {
+                    Text(
+                        text = "体重: ${it.weight}kg",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                } ?: run {
+                    Text(
+                        text = "体重: 記録なし",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                }
 
                 Button(
                     onClick = {
@@ -137,6 +168,7 @@ fun RecordScreen(
 
                 Button(
                     onClick = {
+                        // ボタンクリック時に運動記録を登録
                         coroutineScope.launch {
                             db.insertMotion(
                                 MotionEntity(
@@ -154,6 +186,7 @@ fun RecordScreen(
         }
     )
 }
+
 
 @Composable
 @Preview(showBackground = true)
