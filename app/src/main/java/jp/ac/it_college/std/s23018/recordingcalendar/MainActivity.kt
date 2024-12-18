@@ -22,24 +22,24 @@ class MainActivity : ComponentActivity() {
            RecordingCalendarTheme {
                AppNavigation()
 
-               Surface {
-                   val coroutineScope = rememberCoroutineScope()
-                   val app = application as RecordingCalendarApplication
-                   val db = app.container.userRepository
-                   val user = UserEntity(
-                       name = "山田　太郎", weight = 65.0f, targetWeight = 60.0f
-                   )
-                   Row {
-                       Button(
-                           onClick = {
-                               coroutineScope.launch {
-                                   db.insertUser(user)
-                               }
-                           }) {
-                           Text(text = "ユーザー登録テスト")
-                       }
-                   }
-               }
+//               Surface {
+//                   val coroutineScope = rememberCoroutineScope()
+//                   val app = application as RecordingCalendarApplication
+//                   val db = app.container.userRepository
+//                   val user = UserEntity(
+//                       name = "山田　太郎", weight = 65.0f, targetWeight = 60.0f
+//                   )
+//                   Row {
+//                       Button(
+//                           onClick = {
+//                               coroutineScope.launch {
+//                                   db.insertUser(user)
+//                               }
+//                           }) {
+//                           Text(text = "ユーザー登録テスト")
+//                       }
+//                   }
+//               }
            }
         }
     }
