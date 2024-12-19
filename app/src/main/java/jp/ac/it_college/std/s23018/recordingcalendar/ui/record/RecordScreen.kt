@@ -1,6 +1,8 @@
 package jp.ac.it_college.std.s23018.recordingcalendar.ui.record
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +29,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -108,7 +115,8 @@ fun RecordScreen(
                 verticalArrangement = Arrangement.Top
             ) {
                 Row(
-                    modifier = modifier.fillMaxWidth(),
+                    modifier = modifier
+                        .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -140,13 +148,59 @@ fun RecordScreen(
                 }
 
                 weightRecord?.let {
-                    Text(
-                        text = "体重: ${it.weight}kg",
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        modifier = Modifier.padding(top = 16.dp)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                "体重:",
+                                fontSize = 25.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                "${it.weight}kg",
+                                fontSize = 30.sp,
+                                modifier = Modifier.padding(end = 10.dp),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 10.dp),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+
+                            Text(
+                                text = "編集する",
+                                fontSize = 13.sp,
+                                color = Color.Gray,
+                                modifier = Modifier
+                                    .padding(start = 5.dp)
+                                    .clickable {
+                                        coroutineScope.launch {
+                                            db.updateWeight(
+                                                WeightEntity(
+                                                    date = selectedDate.toString(),
+                                                    weight = 64.3f
+                                                )
+                                            )
+                                        }
+                                    }
+                            )
+                        }
+                    }
+                    Divider(
+                        color = Color.Gray,
+                        thickness = 5.dp
                     )
                 } ?: run {
                     Text(
@@ -157,23 +211,25 @@ fun RecordScreen(
                         ),
                         modifier = Modifier.padding(top = 16.dp)
                     )
+                    Text(
+                        text = "体重を登録する",
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .clickable {
+                                coroutineScope.launch {
+                                    db.insertWeight(
+                                        WeightEntity(
+                                            date = selectedDate.toString(),
+                                            weight = 64.3f
+                                        )
+                                    )
+                                }
+                            }
+                            .padding(vertical = 8.dp)
+                    )
                 }
 
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            db.insertWeight(
-                                WeightEntity(
-                                    date = selectedDate.toString(),
-                                    weight = 64.0f
-                                )
-                            )
-                        }
-                    },
-                    modifier = Modifier.padding(vertical = 8.dp)
-                ) {
-                    Text(text = "体重を登録")
-                }
+
 
                 motionRecord?.let {
                     Text(
@@ -184,6 +240,22 @@ fun RecordScreen(
                         ),
                         modifier = Modifier.padding(top = 16.dp)
                     )
+                    Text(
+                        text = "運動記録を編集する",
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .clickable {
+                                coroutineScope.launch {
+                                    db.updateMotion(
+                                        MotionEntity(
+                                            motion = "baseball",
+                                            time = 90
+                                        )
+                                    )
+                                }
+                            }
+                            .padding(vertical = 8.dp)
+                    )
                 } ?: run {
                     Text(
                         text = "運動記録: なし",
@@ -193,23 +265,22 @@ fun RecordScreen(
                         ),
                         modifier = Modifier.padding(top = 16.dp)
                     )
-                }
-
-                Button(
-                    onClick = {
-                        // ボタンクリック時に運動記録を登録
-                        coroutineScope.launch {
-                            db.insertMotion(
-                                MotionEntity(
-                                    date = selectedDate.toString(),
-                                    motion = "Strength training",
-                                    time = 45
-                                )
-                            )
-                        }
-                    }
-                ) {
-                    Text(text = "運動記録を登録")
+                    Text(
+                        text = "運動記録を登録する",
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .clickable {
+                                coroutineScope.launch {
+                                    db.insertMotion(
+                                        MotionEntity(
+                                            motion = "running",
+                                            time = 45
+                                        )
+                                    )
+                                }
+                            }
+                            .padding(vertical = 8.dp)
+                    )
                 }
             }
         }
