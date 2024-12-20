@@ -1,3 +1,4 @@
+
 package jp.ac.it_college.std.s23018.recordingcalendar.data.dao
 
 import androidx.room.Dao
@@ -20,13 +21,13 @@ interface RecordDao {
     fun getWeightByDate(date: String): WeightEntity?
 
     @Insert //運動記録入力・追加
-    suspend fun motionInsert(motion:MotionEntity)
+    suspend fun motionInsert(motions:List<MotionEntity>)
 
     @Update //運動記録編集
     suspend fun motionUpdate(motion: MotionEntity)
 
     @Query("SELECT * FROM motion WHERE date = :date") //運動記録表示(記録画面&カレンダー画面）
-    fun getMotionsByDate(date: String): MotionEntity?
+    fun getMotionsByDate(date: String): List<MotionEntity>
 
     @Query("SELECT * FROM weight WHERE date BETWEEN :startDate AND :endDate ORDER BY date ASC")//１週間グラフの体重記録表示
     fun getWeeklyWeights(startDate: String, endDate: String): Flow<List<WeightEntity>>
@@ -36,6 +37,4 @@ interface RecordDao {
 
     @Query("SELECT * FROM weight WHERE date BETWEEN :startDate AND :endDate ORDER BY date ASC")//１年間グラフの体重記録表示
     fun getYearlyWeights(startDate: String, endDate: String): Flow<List<WeightEntity>>
-
-
 }

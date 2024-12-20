@@ -1,8 +1,7 @@
 package jp.ac.it_college.std.s23018.recordingcalendar.data
 
 import android.content.Context
-import androidx.room.Database
-import jp.ac.it_college.std.s23018.recordingcalendar.data.impl.RecordRepositoryImpl
+import jp.ac.it_college.std.s23018.recordingcalendar.data.repository.impl.RecordRepositoryImpl
 import jp.ac.it_college.std.s23018.recordingcalendar.data.impl.UserRepositoryImpl
 import jp.ac.it_college.std.s23018.recordingcalendar.data.repository.RecordRepository
 import jp.ac.it_college.std.s23018.recordingcalendar.data.repository.UserRepository

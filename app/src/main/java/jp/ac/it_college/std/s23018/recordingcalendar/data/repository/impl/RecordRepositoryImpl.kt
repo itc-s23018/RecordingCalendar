@@ -1,4 +1,4 @@
-package jp.ac.it_college.std.s23018.recordingcalendar.data.impl
+package jp.ac.it_college.std.s23018.recordingcalendar.data.repository.impl
 
 import jp.ac.it_college.std.s23018.recordingcalendar.data.dao.RecordDao
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
@@ -13,9 +13,9 @@ class RecordRepositoryImpl @Inject constructor(
     override suspend fun updateWeight(weight: WeightEntity) = dao.weightUpdate(weight)
     override suspend fun getWeightByDate(date: String): WeightEntity? = dao.getWeightByDate(date)
 
-    override suspend fun insertMotion(motion: MotionEntity) = dao.motionInsert(motion)
+    override suspend fun insertMotion(motions: MotionEntity) = dao.motionInsert(listOf(motions))
     override suspend fun updateMotion(motion: MotionEntity) = dao.motionUpdate(motion)
-    override suspend fun getMotionsByDate(date: String): MotionEntity?  = dao.getMotionsByDate(date)
+    override suspend fun getMotionsByDate(date: String): List<MotionEntity>  = dao.getMotionsByDate(date)
 
 
 //    override suspend fun getWeeklyWeights(weight: WeightEntity) = dao.getWeeklyWeights(startDate = , endDate = )

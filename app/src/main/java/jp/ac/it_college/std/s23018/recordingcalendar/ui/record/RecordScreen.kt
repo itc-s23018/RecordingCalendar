@@ -1,7 +1,6 @@
 package jp.ac.it_college.std.s23018.recordingcalendar.ui.record
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -29,17 +27,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import jp.ac.it_college.std.s23018.recordingcalendar.R
 import jp.ac.it_college.std.s23018.recordingcalendar.RecordingCalendarApplication
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
@@ -77,7 +70,7 @@ fun RecordScreen(
     }
 
     var motionRecord by remember {
-        mutableStateOf<MotionEntity?>(null)
+        mutableStateOf<List<MotionEntity?>>(emptyList())
     }
 
     val app = navController.context.applicationContext as RecordingCalendarApplication
@@ -87,15 +80,15 @@ fun RecordScreen(
 
 
     LaunchedEffect(selectedDate) {
-        val weightData = withContext(Dispatchers.IO){
+        val weightData = withContext(Dispatchers.IO) {
             db.getWeightByDate(selectedDate.toString())
         }
 
-        val motionData = withContext(Dispatchers.IO){
+        val motionData = withContext(Dispatchers.IO) {
             db.getMotionsByDate(selectedDate.toString())
         }
         weightRecord = weightData
-        motionRecord = motionData
+        motionRecord = motionData ?: emptyList()
     }
 
     Scaffold(
@@ -228,95 +221,78 @@ fun RecordScreen(
                     )
                 }
 
-                motionRecord?.let {
+                if (motionRecord.isNotEmpty()) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 16.dp)
+                            .padding(horizontal = 16.dp)
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                """
-                                    
-                                    運動記録:  
-                                      
-                                """.trimIndent(),
-                                fontSize = 25.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                        motionRecord.forEach { motion ->
+                            motion?.let {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
+                                ) {
+                                    Text(
+                                        "運動記録:",
+                                        fontSize = 25.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        """
+                                            ${motion.name},
+                                            ${motion.time}分
+                                        """.trimIndent(),
+                                        fontSize = 30.sp,
+                                        modifier = Modifier.padding(end = 10.dp),
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
 
-                            Text(
-                                """
-                                    ${it.motion}
-                                    
-                                    ${it.time}分
-                                """.trimIndent(),
-                                fontSize = 30.sp,
-                                modifier = Modifier.padding(end = 10.dp),
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 10.dp),
-                            horizontalArrangement = Arrangement.End
-                        ){
-                            Text(
-                                text = "編集する",
-                                fontSize = 15.sp,
-                                color = Color.Gray,
-                                modifier = Modifier
-                                    .padding(start = 5.dp)
-                                    .clickable {
-                                        coroutineScope.launch {
-                                            db.updateMotion(
-                                                MotionEntity(
-                                                    date = selectedDate.toString(),
-                                                    motion = "Swimming",
-                                                    45
-                                                )
-                                            )
-                                        }
-                                    }
-                            )
-                        }
-                        Divider(
-                            color = Color.Gray,
-                            thickness = 5.dp
-                        )
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 10.dp),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            Text(
-                                text = "追加する",
-                                fontSize = 15.sp,
-                                color = Color.Gray,
-                                modifier = Modifier
-                                    .clickable {
-                                        coroutineScope.launch {
-                                            db.insertMotion(
-                                                MotionEntity(
-                                                    date = selectedDate.toString(),
-                                                    motion = "running",
-                                                    time = 45
-                                                )
-                                            )
-                                        }
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    Text(
+                                        text = "編集する",
+                                        fontSize = 15.sp,
+                                        color = Color.Gray,
+                                        modifier = Modifier
+                                            .padding(start = 5.dp)
+                                            .clickable {
+                                                coroutineScope.launch {
+                                                    db.updateMotion(
+                                                        motion.copy(name = "Swimming", time = 45)
+                                                    )
+                                                }
+                                            }
+                                    )
+                                }
+                                Divider(color = Color.Gray, thickness = 5.dp)
 
-                                    }
-                            )
+                                Text(
+                                    text = "追加する",
+                                    color = Color.Gray,
+                                    modifier = Modifier
+                                        .clickable {
+                                            coroutineScope.launch {
+                                                db.insertMotion(
+                                                    MotionEntity(
+                                                        date = selectedDate.toString(),
+                                                        name = "baseball",
+                                                        time = 50
+                                                    )
+                                                )
+                                            }
+                                        }
+                                )
+                            }
                         }
                     }
-                } ?: run {
+                } else {
                     Text(
                         text = "運動記録: なし",
                         style = MaterialTheme.typography.bodyMedium.copy(
@@ -334,16 +310,17 @@ fun RecordScreen(
                                     db.insertMotion(
                                         MotionEntity(
                                             date = selectedDate.toString(),
-                                            motion = "running",
+                                            name = "running",
                                             time = 45
                                         )
                                     )
                                 }
                             }
-
                     )
+
                 }
             }
+
         }
     )
 }

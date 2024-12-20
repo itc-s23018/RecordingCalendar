@@ -8,8 +8,9 @@ import java.util.Locale
 
 @Entity(tableName = "motion")
 data class MotionEntity(
-    @PrimaryKey val date: String = getCurrentDate(),
-    val motion: String,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val date: String = getCurrentDate().substring(0,10),
+    val name: String,
     val time: Int
 )
 

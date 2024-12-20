@@ -14,23 +14,25 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 
 @Database(entities = [UserEntity::class, WeightEntity::class, MotionEntity::class],
-    version = 1,
+    version = 2,  // バージョン番号を変更
     exportSchema = false)
-abstract class RecordingCalendarDatabase: RoomDatabase() {
+abstract class RecordingCalendarDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun recordDao(): RecordDao
 
-    companion object{
+    companion object {
         @Volatile
         private var Instance: RecordingCalendarDatabase? = null
 
         @OptIn(InternalCoroutinesApi::class)
         fun getDatabase(context: Context): RecordingCalendarDatabase {
-            return Instance ?: synchronized(this){
+            return Instance ?: synchronized(this) {
                 Room.databaseBuilder(
                     context, RecordingCalendarDatabase::class.java,
                     "recordCalendar_database"
-                ).build().also { Instance = it }
+                )
+                    .fallbackToDestructiveMigration() // データベースを再作成
+                    .build().also { Instance = it }
             }
         }
     }
