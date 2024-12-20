@@ -92,7 +92,7 @@ fun RecordScreen(
         }
 
         val motionData = withContext(Dispatchers.IO){
-            db.getMotionByDate(selectedDate.toString())
+            db.getMotionsByDate(selectedDate.toString())
         }
         weightRecord = weightData
         motionRecord = motionData
@@ -268,22 +268,22 @@ fun RecordScreen(
                             horizontalArrangement = Arrangement.End
                         ){
                             Text(
-                            text = "編集する",
-                            fontSize = 15.sp,
-                            color = Color.Gray,
-                            modifier = Modifier
-                                .padding(start = 5.dp)
-                                .clickable {
-                                    coroutineScope.launch {
-                                        db.updateMotion(
-                                            MotionEntity(
-                                                date = selectedDate.toString(),
-                                                motion = "Swimming",
-                                                45
+                                text = "編集する",
+                                fontSize = 15.sp,
+                                color = Color.Gray,
+                                modifier = Modifier
+                                    .padding(start = 5.dp)
+                                    .clickable {
+                                        coroutineScope.launch {
+                                            db.updateMotion(
+                                                MotionEntity(
+                                                    date = selectedDate.toString(),
+                                                    motion = "Swimming",
+                                                    45
+                                                )
                                             )
-                                        )
+                                        }
                                     }
-                                }
                             )
                         }
                         Divider(

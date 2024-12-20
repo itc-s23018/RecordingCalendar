@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "weight")
 data class WeightEntity(
-    @PrimaryKey val date: String = getCurrentDate() ,
+    @PrimaryKey val date: String = getCurrentDate(),
     val weight: Float
 )
-
