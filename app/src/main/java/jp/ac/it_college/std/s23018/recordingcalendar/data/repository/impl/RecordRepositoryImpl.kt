@@ -15,6 +15,8 @@ class RecordRepositoryImpl @Inject constructor(
 
     override suspend fun insertMotion(motions: MotionEntity) = dao.motionInsert(listOf(motions))
     override suspend fun updateMotion(motion: MotionEntity) = dao.motionUpdate(motion)
+    override suspend fun deleteMotion(motion: MotionEntity) = dao.motionDelete(motion)
+
     override suspend fun getMotionsByDate(date: String): List<MotionEntity>  = dao.getMotionsByDate(date)
 
 

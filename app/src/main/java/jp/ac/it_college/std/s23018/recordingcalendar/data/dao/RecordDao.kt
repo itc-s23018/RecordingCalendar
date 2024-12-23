@@ -2,6 +2,7 @@
 package jp.ac.it_college.std.s23018.recordingcalendar.data.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -25,6 +26,9 @@ interface RecordDao {
 
     @Update //運動記録編集
     suspend fun motionUpdate(motion: MotionEntity)
+
+    @Delete
+    suspend fun motionDelete(motion: MotionEntity)
 
     @Query("SELECT * FROM motion WHERE date = :date") //運動記録表示(記録画面&カレンダー画面）
     fun getMotionsByDate(date: String): List<MotionEntity>

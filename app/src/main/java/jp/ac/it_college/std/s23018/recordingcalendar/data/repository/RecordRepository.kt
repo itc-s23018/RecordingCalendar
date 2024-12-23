@@ -10,6 +10,7 @@ interface RecordRepository {
 
     suspend fun insertMotion(motions: MotionEntity)
     suspend fun updateMotion(motion:MotionEntity)
+    suspend fun deleteMotion(motion: MotionEntity)
     suspend fun getMotionsByDate(date: String): List<MotionEntity>
 
 //    suspend fun getWeeklyWeights(weight: WeightEntity)

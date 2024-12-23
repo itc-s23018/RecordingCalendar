@@ -28,20 +28,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import jp.ac.it_college.std.s23018.recordingcalendar.R
 import jp.ac.it_college.std.s23018.recordingcalendar.RecordingCalendarApplication
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
-import jp.ac.it_college.std.s23018.recordingcalendar.mock.RecordScreenMock
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.RecordingCalendarAppBar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,9 +53,8 @@ fun RecordScreen(
     selectedYear: String,
     selectedMonth: String,
     selectedDay: String,
-    modifier: Modifier = Modifier,
-    db: RecordScreenMock // モックリポジトリを受け取る
-)  {
+    modifier: Modifier = Modifier
+) {
 
     var selectedDate by remember {
         mutableStateOf(
@@ -79,7 +74,11 @@ fun RecordScreen(
         mutableStateOf<List<MotionEntity?>>(emptyList())
     }
 
+    val app = navController.context.applicationContext as RecordingCalendarApplication
+    val db = app.container.recordRepository
+
     val coroutineScope = rememberCoroutineScope()
+
 
     LaunchedEffect(selectedDate) {
         val weightData = withContext(Dispatchers.IO) {
@@ -90,7 +89,7 @@ fun RecordScreen(
             db.getMotionsByDate(selectedDate.toString())
         }
         weightRecord = weightData
-        motionRecord = motionData ?: emptyList()
+        motionRecord = motionData
     }
 
     Scaffold(
@@ -239,12 +238,12 @@ fun RecordScreen(
                                 ) {
                                     Text(
                                         """
-                                              
                                             運動記録:
-                                              
                                         """.trimIndent(),
                                         fontSize = 25.sp,
                                         fontWeight = FontWeight.Bold,
+                                        modifier = Modifier
+                                            .padding(top = 15.dp)
                                     )
                                     Text(
                                         """
@@ -254,7 +253,9 @@ fun RecordScreen(
                                         """.trimIndent(),
                                         fontSize = 25.sp,
                                         fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.fillMaxWidth(),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 10.dp, bottom = 10.dp),
                                         textAlign = TextAlign.End
                                     )
                                 }
@@ -279,10 +280,46 @@ fun RecordScreen(
                                                 }
                                             }
                                     )
+
+                                    Text(
+                                        text = "削除する",
+                                        fontSize = 15.sp,
+                                        color = Color.Gray,
+                                        modifier = Modifier
+                                            .padding(start = 5.dp)
+                                            .clickable {
+                                                coroutineScope.launch {
+                                                    db.deleteMotion(motion)
+                                                }
+                                            }
+                                    )
                                 }
                                 Divider(color = Color.Gray, thickness = 5.dp)
                             }
                         }
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Text(
+                            text = "追加する",
+                            color = Color.Gray,
+                            modifier = Modifier
+                                .clickable {
+                                    coroutineScope.launch {
+                                        db.insertMotion(
+                                            MotionEntity(
+                                                date = selectedDate.toString(),
+                                                name = "Running",
+                                                time = 35
+                                            )
+                                        )
+                                    }
+                                }
+                        )
                     }
                 } else {
                     Text(
@@ -310,29 +347,7 @@ fun RecordScreen(
                             }
                     )
                 }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Text(
-                        text = "追加する",
-                        color = Color.Gray,
-                        modifier = Modifier
-                            .clickable {
-                                coroutineScope.launch {
-                                    db.insertMotion(
-                                        MotionEntity(
-                                            date = selectedDate.toString(),
-                                            name = "baseball",
-                                            time = 50
-                                        )
-                                    )
-                                }
-                            }
-                    )
-                }
+
             }
 
         }
@@ -340,23 +355,3 @@ fun RecordScreen(
 }
 
 
-@Preview
-@Composable
-private fun RecordScreenPreview() {
-    val mockNavController = rememberNavController()
-
-    val selectedYear = "2024"
-    val selectedMonth = "12"
-    val selectedDay = "23"
-
-   val mockDb = RecordScreenMock
-
-    RecordScreen(
-        navController = mockNavController,
-        selectedYear = selectedYear,
-        selectedMonth = selectedMonth,
-        selectedDay = selectedDay,
-        modifier = Modifier.fillMaxWidth(),
-        db = mockDb
-    )
-}
