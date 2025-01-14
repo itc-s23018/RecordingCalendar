@@ -39,6 +39,7 @@ import jp.ac.it_college.std.s23018.recordingcalendar.RecordingCalendarApplicatio
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.RecordingCalendarAppBar
+import jp.ac.it_college.std.s23018.recordingcalendar.ui.dialog.DeleteMotionDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -78,6 +79,9 @@ fun RecordScreen(
     val db = app.container.recordRepository
 
     val coroutineScope = rememberCoroutineScope()
+
+    var showDialog by remember { mutableStateOf(false) }
+    var motionToDelete by remember { mutableStateOf<MotionEntity?>(null) }
 
 
     LaunchedEffect(selectedDate) {
@@ -288,15 +292,28 @@ fun RecordScreen(
                                         modifier = Modifier
                                             .padding(start = 5.dp)
                                             .clickable {
-                                                coroutineScope.launch {
-                                                    db.deleteMotion(motion)
-                                                }
+                                              motionToDelete = motion
+                                                showDialog = true
                                             }
                                     )
                                 }
                                 Divider(color = Color.Gray, thickness = 5.dp)
                             }
                         }
+                    }
+
+                    if(showDialog && motionToDelete != null){
+                        DeleteMotionDialog(
+                            onConfirm = {
+                                coroutineScope.launch {
+                                    db.deleteMotion(motionToDelete!!)
+                                }
+                                showDialog = false
+                            },
+                            onDismiss = {
+                                showDialog = false
+                            }
+                        )
                     }
                     Row(
                         modifier = Modifier
