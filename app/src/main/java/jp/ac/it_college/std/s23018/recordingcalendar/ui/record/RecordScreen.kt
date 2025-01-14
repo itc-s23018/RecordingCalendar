@@ -309,7 +309,6 @@ fun RecordScreen(
                                             .clickable {
                                               motionToDelete = motion
                                                 showDialog = true
-                                                Toast.makeText(context,"運動記録を削除しました",Toast.LENGTH_SHORT).show()
                                             }
                                     )
                                 }
@@ -324,6 +323,8 @@ fun RecordScreen(
                                 coroutineScope.launch {
                                     db.deleteMotion(motionToDelete!!)
                                     refreshData()
+                                    Toast.makeText(context,"運動記録を削除しました",Toast.LENGTH_SHORT).show()
+
                                 }
                                 showDialog = false
                             },
@@ -351,6 +352,7 @@ fun RecordScreen(
                                                 time = 35
                                             )
                                         )
+                                        Toast.makeText(context,"運動記録を追加しました",Toast.LENGTH_SHORT).show()
                                         refreshData()
                                     }
                                 }
