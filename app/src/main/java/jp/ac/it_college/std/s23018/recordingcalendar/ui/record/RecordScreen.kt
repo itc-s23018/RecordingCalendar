@@ -1,6 +1,7 @@
 package jp.ac.it_college.std.s23018.recordingcalendar.ui.record
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -79,6 +81,8 @@ fun RecordScreen(
     val db = app.container.recordRepository
 
     val coroutineScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
 
     var showDialog by remember { mutableStateOf(false) }
     var motionToDelete by remember { mutableStateOf<MotionEntity?>(null) }
@@ -191,6 +195,7 @@ fun RecordScreen(
                                                     weight = 64.3f
                                                 )
                                             )
+                                            Toast.makeText(context,"体重記録を更新しました",Toast.LENGTH_SHORT).show()
                                         }
                                     }
                             )
@@ -221,6 +226,7 @@ fun RecordScreen(
                                             weight = 64.3f
                                         )
                                     )
+                                    Toast.makeText(context,"体重記録を追加しました",Toast.LENGTH_SHORT).show()
                                 }
                             }
                     )
@@ -281,9 +287,11 @@ fun RecordScreen(
                                                     db.updateMotion(
                                                         motion.copy(name = "Swimming", time = 45)
                                                     )
+                                                    Toast.makeText(context,"運動記録を更新しました",Toast.LENGTH_SHORT).show()
                                                 }
                                             }
                                     )
+
 
                                     Text(
                                         text = "削除する",
@@ -294,6 +302,7 @@ fun RecordScreen(
                                             .clickable {
                                               motionToDelete = motion
                                                 showDialog = true
+                                                Toast.makeText(context,"運動記録を削除しました",Toast.LENGTH_SHORT).show()
                                             }
                                     )
                                 }
@@ -360,6 +369,7 @@ fun RecordScreen(
                                             time = 45
                                         )
                                     )
+                                    Toast.makeText(context,"運動記録を追加しました",Toast.LENGTH_SHORT).show()
                                 }
                             }
                     )
