@@ -87,17 +87,21 @@ fun RecordScreen(
     var showDialog by remember { mutableStateOf(false) }
     var motionToDelete by remember { mutableStateOf<MotionEntity?>(null) }
 
+    fun refreshData() {
+        coroutineScope.launch {
+            val weightData = withContext(Dispatchers.IO){
+                db.getWeightByDate(selectedDate.toString())
+            }
+            val motionData = withContext(Dispatchers.IO){
+                db.getMotionsByDate(selectedDate.toString())
+            }
+            weightRecord = weightData
+            motionRecord = motionData
+        }
+    }
 
     LaunchedEffect(selectedDate) {
-        val weightData = withContext(Dispatchers.IO) {
-            db.getWeightByDate(selectedDate.toString())
-        }
-
-        val motionData = withContext(Dispatchers.IO) {
-            db.getMotionsByDate(selectedDate.toString())
-        }
-        weightRecord = weightData
-        motionRecord = motionData
+       refreshData()
     }
 
     Scaffold(
@@ -196,6 +200,7 @@ fun RecordScreen(
                                                 )
                                             )
                                             Toast.makeText(context,"体重記録を更新しました",Toast.LENGTH_SHORT).show()
+                                            refreshData()
                                         }
                                     }
                             )
@@ -227,6 +232,7 @@ fun RecordScreen(
                                         )
                                     )
                                     Toast.makeText(context,"体重記録を追加しました",Toast.LENGTH_SHORT).show()
+                                    refreshData()
                                 }
                             }
                     )
@@ -288,6 +294,7 @@ fun RecordScreen(
                                                         motion.copy(name = "Swimming", time = 45)
                                                     )
                                                     Toast.makeText(context,"運動記録を更新しました",Toast.LENGTH_SHORT).show()
+                                                    refreshData()
                                                 }
                                             }
                                     )
@@ -316,6 +323,7 @@ fun RecordScreen(
                             onConfirm = {
                                 coroutineScope.launch {
                                     db.deleteMotion(motionToDelete!!)
+                                    refreshData()
                                 }
                                 showDialog = false
                             },
@@ -343,6 +351,7 @@ fun RecordScreen(
                                                 time = 35
                                             )
                                         )
+                                        refreshData()
                                     }
                                 }
                         )
@@ -370,6 +379,7 @@ fun RecordScreen(
                                         )
                                     )
                                     Toast.makeText(context,"運動記録を追加しました",Toast.LENGTH_SHORT).show()
+                                    refreshData()
                                 }
                             }
                     )
