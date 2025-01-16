@@ -42,6 +42,7 @@ import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.RecordingCalendarAppBar
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.dialog.DeleteMotionDialog
+import jp.ac.it_college.std.s23018.recordingcalendar.ui.dialog.EditMotionDialog
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.dialog.RecordMotionDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -87,6 +88,7 @@ fun RecordScreen(
 
     var showDialog by remember { mutableStateOf(false) }
 
+    var motionToEdit by remember { mutableStateOf<MotionEntity?>(null) }
 
     var motionToDelete by remember { mutableStateOf<MotionEntity?>(null) }
 
@@ -307,15 +309,28 @@ fun RecordScreen(
                                         modifier = Modifier
                                             .padding(start = 5.dp)
                                             .clickable {
-                                                coroutineScope.launch {
-                                                    db.updateMotion(
-                                                        motion.copy(name = "Swimming", time = 45)
-                                                    )
-                                                    Toast.makeText(context,"運動記録を更新しました",Toast.LENGTH_SHORT).show()
-                                                    refreshData()
-                                                }
+                                                motionToEdit = motion
+                                                showDialog = true
                                             }
                                     )
+
+                                    if(showDialog && motionToEdit != null){
+                                        EditMotionDialog(
+                                            onConfirm = {name, time ->
+                                                coroutineScope.launch {
+                                                    db.updateMotion(
+                                                        motionToEdit!!.copy(name = name, time = time)
+                                                    )
+                                                    Toast.makeText(context, "運動記録を更新しました", Toast.LENGTH_SHORT).show()
+                                                    refreshData()
+                                                }
+                                                showDialog = false
+                                            },
+                                            onDismiss = {showDialog = false},
+                                            initialMotion =  motionToEdit!!.name,
+                                            initialTime = motionToEdit!!.time
+                                        )
+                                    }
 
 
                                     Text(
