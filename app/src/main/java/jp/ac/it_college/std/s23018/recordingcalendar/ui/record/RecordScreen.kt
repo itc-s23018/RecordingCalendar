@@ -42,6 +42,7 @@ import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.RecordingCalendarAppBar
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.dialog.DeleteMotionDialog
+import jp.ac.it_college.std.s23018.recordingcalendar.ui.dialog.RecordMotionDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -85,6 +86,8 @@ fun RecordScreen(
     val context = LocalContext.current
 
     var showDialog by remember { mutableStateOf(false) }
+
+
     var motionToDelete by remember { mutableStateOf<MotionEntity?>(null) }
 
     fun refreshData() {
@@ -98,6 +101,21 @@ fun RecordScreen(
             weightRecord = weightData
             motionRecord = motionData
         }
+    }
+
+    fun handleMotionConfirm(name:String, time:Int){
+        coroutineScope.launch {
+            db.insertMotion(
+                MotionEntity(
+                    date = selectedDate.toString(),
+                    name = name,
+                    time = time
+                )
+            )
+            Toast.makeText(context,"運動記録を追加しました", Toast.LENGTH_SHORT).show()
+            refreshData()
+        }
+        showDialog = false
     }
 
     LaunchedEffect(selectedDate) {
@@ -373,18 +391,17 @@ fun RecordScreen(
                         modifier = Modifier
                             .clickable {
                                 coroutineScope.launch {
-                                    db.insertMotion(
-                                        MotionEntity(
-                                            date = selectedDate.toString(),
-                                            name = "running",
-                                            time = 45
-                                        )
-                                    )
-                                    Toast.makeText(context,"運動記録を追加しました",Toast.LENGTH_SHORT).show()
-                                    refreshData()
+                                   showDialog = true
                                 }
                             }
                     )
+
+                    if(showDialog) {
+                        RecordMotionDialog(
+                            onConfirm = {name, time -> handleMotionConfirm(name, time)},
+                            onDismiss = { showDialog = false}
+                        )
+                    }
                 }
 
             }
