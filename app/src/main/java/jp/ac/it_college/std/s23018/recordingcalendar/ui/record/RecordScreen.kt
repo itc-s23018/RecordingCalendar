@@ -88,9 +88,15 @@ fun RecordScreen(
 
     val context = LocalContext.current
 
-    var showWeightDialog by remember { mutableStateOf(false) }
+    var showAddWeightDialog by remember { mutableStateOf(false) }
 
-    var showMotionDialog by remember { mutableStateOf(false) }
+    var showEditWeightDialog by remember { mutableStateOf(false) }
+
+    var showAddMotionDialog by remember { mutableStateOf(false) }
+
+    var showEditMotionDialog by remember { mutableStateOf(false) }
+
+    var showDeleteMotionDialog by remember { mutableStateOf(false) }
 
     var weightToEdit by remember { mutableStateOf<WeightEntity?>(null) }
 
@@ -122,7 +128,7 @@ fun RecordScreen(
             Toast.makeText(context, "体重記録を追加しました", Toast.LENGTH_SHORT).show()
             refreshData()
         }
-        showWeightDialog  = false
+        showAddWeightDialog  = false
     }
 
     fun handleMotionConfirm(name:String, time:Int){
@@ -137,7 +143,7 @@ fun RecordScreen(
             Toast.makeText(context,"運動記録を追加しました", Toast.LENGTH_SHORT).show()
             refreshData()
         }
-        showMotionDialog = false
+        showAddMotionDialog = false
     }
 
     LaunchedEffect(selectedDate) {
@@ -233,11 +239,11 @@ fun RecordScreen(
                                     .padding(start = 5.dp)
                                     .clickable {
                                         weightToEdit = weight
-                                        showWeightDialog = true
+                                        showEditWeightDialog = true
                                     }
                             )
 
-                            if(showWeightDialog) {
+                            if(showEditWeightDialog) {
                                 EditWeightDialog(
                                     onConfirm = { weight ->
                                         coroutineScope.launch {
@@ -247,9 +253,9 @@ fun RecordScreen(
                                             Toast.makeText(context,"体重記録を更新しました", Toast.LENGTH_SHORT).show()
                                             refreshData()
                                         }
-                                        showWeightDialog = false
+                                        showEditWeightDialog = false
                                     },
-                                    onDismiss = {showWeightDialog = false},
+                                    onDismiss = {showEditWeightDialog = false},
                                     initialWeight = weightToEdit!!.weight
                                 )
                             }
@@ -274,15 +280,15 @@ fun RecordScreen(
                         modifier = Modifier
                             .clickable {
                                 coroutineScope.launch {
-                                    showWeightDialog = true
+                                    showAddWeightDialog = true
                                 }
                             }
                     )
 
-                    if(showWeightDialog) {
+                    if(showAddWeightDialog) {
                         RecordWeightDialog(
                             onConfirm = {weight -> handleWeightConfirm(weight)},
-                            onDismiss = {showMotionDialog = false}
+                            onDismiss = {showAddWeightDialog = false}
                         )
                     }
                 }
@@ -339,11 +345,11 @@ fun RecordScreen(
                                             .padding(start = 5.dp)
                                             .clickable {
                                                 motionToEdit = motion
-                                                showMotionDialog = true
+                                                showEditMotionDialog = true
                                             }
                                     )
 
-                                    if(showMotionDialog && motionToEdit != null){
+                                    if(showEditMotionDialog && motionToEdit != null){
                                         EditMotionDialog(
                                             onConfirm = {name, time ->
                                                 coroutineScope.launch {
@@ -353,9 +359,9 @@ fun RecordScreen(
                                                     Toast.makeText(context, "運動記録を更新しました", Toast.LENGTH_SHORT).show()
                                                     refreshData()
                                                 }
-                                                showMotionDialog = false
+                                                showAddMotionDialog = false
                                             },
-                                            onDismiss = {showMotionDialog = false},
+                                            onDismiss = {showEditMotionDialog = false},
                                             initialMotion =  motionToEdit!!.name,
                                             initialTime = motionToEdit!!.time
                                         )
@@ -370,7 +376,7 @@ fun RecordScreen(
                                             .padding(start = 5.dp)
                                             .clickable {
                                                 motionToDelete = motion
-                                                showMotionDialog = true
+                                                showDeleteMotionDialog = true
                                             }
                                     )
                                 }
@@ -379,7 +385,7 @@ fun RecordScreen(
                         }
                     }
 
-                    if(showMotionDialog && motionToDelete != null){
+                    if(showDeleteMotionDialog && motionToDelete != null){
                         DeleteMotionDialog(
                             onConfirm = {
                                 coroutineScope.launch {
@@ -388,10 +394,10 @@ fun RecordScreen(
                                     Toast.makeText(context,"運動記録を削除しました",Toast.LENGTH_SHORT).show()
 
                                 }
-                                showMotionDialog = false
+                                showDeleteMotionDialog = false
                             },
                             onDismiss = {
-                                showMotionDialog = false
+                                showDeleteMotionDialog = false
                             }
                         )
                     }
@@ -406,15 +412,15 @@ fun RecordScreen(
                             color = Color.Gray,
                             modifier = Modifier
                                 .clickable {
-                                   showMotionDialog = true
+                                   showAddMotionDialog = true
                                 }
                         )
                     }
 
-                    if (showMotionDialog) {
+                    if (showAddMotionDialog) {
                         RecordMotionDialog(
                             onConfirm = {name, time -> handleMotionConfirm(name, time)},
-                            onDismiss = { showMotionDialog = false}
+                            onDismiss = { showAddMotionDialog = false}
                         )
                     }
                 } else {
@@ -432,15 +438,15 @@ fun RecordScreen(
                         modifier = Modifier
                             .clickable {
                                 coroutineScope.launch {
-                                    showMotionDialog = true
+                                    showAddMotionDialog = true
                                 }
                             }
                     )
 
-                    if(showMotionDialog) {
+                    if(showAddMotionDialog) {
                         RecordMotionDialog(
                             onConfirm = {name, time -> handleMotionConfirm(name, time)},
-                            onDismiss = { showMotionDialog = false}
+                            onDismiss = { showAddMotionDialog = false}
                         )
                     }
                 }
