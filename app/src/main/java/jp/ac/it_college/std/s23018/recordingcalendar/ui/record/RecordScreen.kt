@@ -359,7 +359,7 @@ fun RecordScreen(
                                                     Toast.makeText(context, "運動記録を更新しました", Toast.LENGTH_SHORT).show()
                                                     refreshData()
                                                 }
-                                                showAddMotionDialog = false
+                                                showEditMotionDialog = false
                                             },
                                             onDismiss = {showEditMotionDialog = false},
                                             initialMotion =  motionToEdit!!.name,
