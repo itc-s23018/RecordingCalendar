@@ -124,7 +124,7 @@ fun RecordScreen(
         }
         showWeightDialog  = false
     }
-    
+
     fun handleMotionConfirm(name:String, time:Int){
         coroutineScope.launch {
             db.insertMotion(
@@ -141,7 +141,7 @@ fun RecordScreen(
     }
 
     LaunchedEffect(selectedDate) {
-       refreshData()
+        refreshData()
     }
 
     Scaffold(
@@ -237,22 +237,22 @@ fun RecordScreen(
                                     }
                             )
 
-                          if(showWeightDialog) {
-                              EditWeightDialog(
-                                  onConfirm = { weight ->
-                                      coroutineScope.launch {
-                                          db.updateWeight(
-                                              weightToEdit!!.copy(weight = weight)
-                                          )
-                                          Toast.makeText(context,"体重記録を更新しました", Toast.LENGTH_SHORT).show()
-                                          refreshData()
-                                      }
-                                      showWeightDialog = false
-                                  },
-                                  onDismiss = {showWeightDialog = false},
-                                  initialWeight = weightToEdit!!.weight
-                              )
-                          }
+                            if(showWeightDialog) {
+                                EditWeightDialog(
+                                    onConfirm = { weight ->
+                                        coroutineScope.launch {
+                                            db.updateWeight(
+                                                weightToEdit!!.copy(weight = weight)
+                                            )
+                                            Toast.makeText(context,"体重記録を更新しました", Toast.LENGTH_SHORT).show()
+                                            refreshData()
+                                        }
+                                        showWeightDialog = false
+                                    },
+                                    onDismiss = {showWeightDialog = false},
+                                    initialWeight = weightToEdit!!.weight
+                                )
+                            }
                         }
                     }
                     Divider(
@@ -273,7 +273,7 @@ fun RecordScreen(
                         color = Color.Gray,
                         modifier = Modifier
                             .clickable {
-                                coroutineScope.launch { 
+                                coroutineScope.launch {
                                     showWeightDialog = true
                                 }
                             }
@@ -369,7 +369,7 @@ fun RecordScreen(
                                         modifier = Modifier
                                             .padding(start = 5.dp)
                                             .clickable {
-                                              motionToDelete = motion
+                                                motionToDelete = motion
                                                 showMotionDialog = true
                                             }
                                     )
@@ -406,18 +406,15 @@ fun RecordScreen(
                             color = Color.Gray,
                             modifier = Modifier
                                 .clickable {
-                                    coroutineScope.launch {
-                                        db.insertMotion(
-                                            MotionEntity(
-                                                date = selectedDate.toString(),
-                                                name = "Running",
-                                                time = 35
-                                            )
-                                        )
-                                        Toast.makeText(context,"運動記録を追加しました",Toast.LENGTH_SHORT).show()
-                                        refreshData()
-                                    }
+                                   showMotionDialog = true
                                 }
+                        )
+                    }
+
+                    if (showMotionDialog) {
+                        RecordMotionDialog(
+                            onConfirm = {name, time -> handleMotionConfirm(name, time)},
+                            onDismiss = { showMotionDialog = false}
                         )
                     }
                 } else {
@@ -435,7 +432,7 @@ fun RecordScreen(
                         modifier = Modifier
                             .clickable {
                                 coroutineScope.launch {
-                                   showMotionDialog = true
+                                    showMotionDialog = true
                                 }
                             }
                     )
@@ -453,5 +450,3 @@ fun RecordScreen(
         }
     )
 }
-
-
