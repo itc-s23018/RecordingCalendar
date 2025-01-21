@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -180,6 +181,13 @@ fun CalendarScreen(
                 modifier = Modifier.fillMaxHeight(0.8f)
             ) {
                 for (week in 0..5) {
+                    if( week > 0){
+                        Divider(
+                            color = Color.Black,
+                            thickness = 1.dp,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -197,25 +205,31 @@ fun CalendarScreen(
                                 TextButton(
                                     onClick = { navController.navigate("record/$currentYear/$currentMonth/$currentDayInCell") },
                                     modifier = Modifier
-                                        .size(60.dp)
                                         .padding(0.5.dp)
                                         .weight(1f)
-                                        .let {
-                                            if (isToday) {
-                                                it.background(Color.Red, shape = CircleShape)
-                                            } else {
-                                                it
-                                            }
-                                        }
                                 ) {
-                                    Text(
-                                        text = currentDayInCell.toString(),
-                                        style = MaterialTheme.typography.bodyMedium.copy(
-                                            fontSize = 25.sp,
-                                            color = if(isToday) Color.White else textColor,
+                                    Box(
+                                        modifier = Modifier
+                                            .size(50.dp)
+                                            .let {
+                                                if (isToday) {
+                                                    it.background(Color.Red, shape = CircleShape)
+                                                } else {
+                                                    it
+                                                }
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = currentDayInCell.toString(),
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                fontSize = 25.sp,
+                                                color = if (isToday) Color.White else textColor
+                                            )
                                         )
-                                    )
+                                    }
                                 }
+
                             } else {
                                 Spacer(modifier = Modifier.weight(1f))
                             }
