@@ -155,7 +155,7 @@ fun RecordScreen(
             RecordingCalendarAppBar(
                 title = stringResource(id = R.string.record),
                 canNavigationBack = true,
-                navigateUp = { navController.navigate("calendar") }
+                navigateUp = { navController.navigate("tabRow") }
             )
         },
         content = {
@@ -412,7 +412,7 @@ fun RecordScreen(
                             color = Color.Gray,
                             modifier = Modifier
                                 .clickable {
-                                   showAddMotionDialog = true
+                                    showAddMotionDialog = true
                                 }
                         )
                     }
