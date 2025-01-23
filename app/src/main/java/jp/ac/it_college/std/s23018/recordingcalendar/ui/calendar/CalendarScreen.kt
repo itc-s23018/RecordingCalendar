@@ -96,7 +96,7 @@ fun CalendarScreen(
 
     val weightRecords = remember { mutableStateOf<Map<LocalDate, WeightEntity>>(emptyMap()) }
 
-    val motionsRecords = remember { mutableStateOf<Map<LocalDate, MotionEntity>>(emptyMap()) }
+    val motionsRecords = remember { mutableStateOf<Map<LocalDate, List<MotionEntity>>>(emptyMap()) }
 
     val app = navController.context.applicationContext as RecordingCalendarApplication
     val db = app.container.recordRepository
@@ -109,15 +109,13 @@ fun CalendarScreen(
             db.getWeightsByMonth(startDate.toString(), endDate.toString())
         }.associateBy { LocalDate.parse(it.date) }
 
-        val motionsrecords = withContext(Dispatchers.IO){
+        val motionsrecords = withContext(Dispatchers.IO) {
             db.getMotionsByMonth(startDate.toString(), endDate.toString())
-        } .associateBy { LocalDate.parse(it.date) }
+        }.groupBy { LocalDate.parse(it.date) }
 
         weightRecords.value = weightrecords
         motionsRecords.value = motionsrecords
     }
-
-
 
 
 
@@ -273,21 +271,19 @@ fun CalendarScreen(
                                             )
                                         }
 
-
-
-                                        val weightRecordForDay = weightRecords.value[LocalDate.of(currentYear, currentMonth, currentDayInCell)]
-                                        val motionsRecordForDay = motionsRecords.value[LocalDate.of(currentYear, currentMonth, currentDayInCell)]
+                                        val weightRecordForDay = weightRecords.value[LocalDate.of(currentYear,currentMonth,currentDayInCell)]
+                                        val motionRecordsForDay = motionsRecords.value[LocalDate.of(currentYear,currentMonth,currentDayInCell)]?.firstOrNull()
 
                                         val combinedText = buildString {
-                                            if(weightRecordForDay != null) {
+                                            if(weightRecordForDay != null){
                                                 append("${weightRecordForDay.weight}Kg\n")
                                             }
-                                            if(motionsRecordForDay != null){
-                                                append("${motionsRecordForDay.name} ${motionsRecordForDay.time}分")
+                                            if(motionRecordsForDay != null){
+                                                append("${motionRecordsForDay.name} ${motionRecordsForDay.time}分")
                                             }
                                         }
 
-                                        if(combinedText.isNotEmpty()) {
+                                        if (combinedText.isNotEmpty()) {
                                             Text(
                                                 text = combinedText,
                                                 style = MaterialTheme.typography.bodySmall.copy(
@@ -328,5 +324,5 @@ private fun CalendarScreenPreview() {
     CalendarScreen(
         navController = rememberNavController(),
 
-    )
+        )
 }
