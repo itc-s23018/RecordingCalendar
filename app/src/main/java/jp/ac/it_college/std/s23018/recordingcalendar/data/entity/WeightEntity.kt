@@ -1,4 +1,3 @@
-
 package jp.ac.it_college.std.s23018.recordingcalendar.data.entity
 
 import androidx.room.Entity

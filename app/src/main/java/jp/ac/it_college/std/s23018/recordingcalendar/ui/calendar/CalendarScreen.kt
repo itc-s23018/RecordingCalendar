@@ -31,9 +31,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,10 +50,14 @@ import androidx.core.app.NotificationCompat.Style
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import jp.ac.it_college.std.s23018.recordingcalendar.R
+import jp.ac.it_college.std.s23018.recordingcalendar.RecordingCalendarApplication
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import java.text.DateFormatSymbols
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Locale
 
@@ -93,6 +99,28 @@ fun CalendarScreen(
     val firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
     // 月の日数を取得
     val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+    //簡単な記録の表示するためデータを取得
+
+    val weightRecords = remember { mutableStateOf<Map<LocalDate, WeightEntity>>(emptyMap()) }
+
+    val app = navController.context.applicationContext as RecordingCalendarApplication
+    val db = app.container.recordRepository
+
+    LaunchedEffect(currentYear, currentMonth) {
+        val startDate = LocalDate.of(currentYear, currentMonth, 1)
+        val endDate = startDate.withDayOfMonth(startDate.lengthOfMonth())
+
+        val records = withContext(Dispatchers.IO) {
+            db.getWeightsByMonth(startDate.toString(), endDate.toString())
+        }.associateBy { LocalDate.parse(it.date) }
+
+        weightRecords.value = records
+    }
+
+
+
+
 
     Scaffold(
         topBar = { //トップバー
@@ -248,23 +276,32 @@ fun CalendarScreen(
 
                                         Spacer(modifier = Modifier.height(5.dp))
 
+                                        val recordForDay = weightRecords.value[LocalDate.of(currentYear, currentMonth, currentDayInCell)]
 
-                                        Text(
-                                            text = """
-                                                記録なし
-                                                記録なし２
-                                                """
-                                                .trimIndent(),
+                                       if(recordForDay != null){
+                                           Text(
+                                               text = "${recordForDay.weight}Kg",
+                                               style = MaterialTheme.typography.bodySmall.copy(
+                                                   fontSize = 12.sp
+                                               ),
+                                               modifier = Modifier
+                                                   .align(Alignment.BottomCenter)
+                                                   .padding(bottom = 8.dp)
+                                           )
+                                       } else {
+                                           Text(
+                                               text = "記録なし",
+                                               style = MaterialTheme.typography.bodySmall.copy(
+                                                   fontSize = 12.sp
+                                               ),
+                                               modifier = Modifier
+                                                   .align(Alignment.BottomCenter)
+                                                   .padding(bottom = 8.dp)
+                                           )
+                                       }
 
 
-                                            style = MaterialTheme.typography.bodySmall.copy(
-                                                fontSize = 12.sp,
-                                                color = Color.Black
-                                            ),
-                                            modifier = Modifier
-                                                .align(Alignment.BottomCenter)
-                                                .padding(bottom = 8.dp)
-                                        )
+
                                     }
                                 }
                             } else {
@@ -293,6 +330,7 @@ fun CalendarScreen(
 @Composable
 private fun CalendarScreenPreview() {
     CalendarScreen(
-        navController = rememberNavController()
+        navController = rememberNavController(),
+
     )
 }

@@ -7,6 +7,7 @@ interface RecordRepository {
     suspend fun insertWeight(weight:WeightEntity)
     suspend fun updateWeight(weight:WeightEntity)
     suspend fun getWeightByDate(date: String):WeightEntity?
+    suspend fun getWeightsByMonth(startDate:String, endDate: String):List<WeightEntity>
 
     suspend fun insertMotion(motions: MotionEntity)
     suspend fun updateMotion(motion:MotionEntity)
