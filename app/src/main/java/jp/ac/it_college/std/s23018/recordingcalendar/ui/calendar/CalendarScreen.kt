@@ -1,21 +1,27 @@
 package jp.ac.it_college.std.s23018.recordingcalendar.ui.calendar
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,9 +44,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationCompat.Style
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import jp.ac.it_college.std.s23018.recordingcalendar.R
+import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
+import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
+import kotlinx.coroutines.coroutineScope
 import java.text.DateFormatSymbols
 import java.util.Calendar
 import java.util.Locale
@@ -165,7 +175,7 @@ fun CalendarScreen(
                             color = textColor
                         ),
                         modifier = Modifier
-                            .padding(4.dp)
+                            .padding(horizontal = 8.dp)
                             .weight(1f),
                         textAlign = TextAlign.Center
                     )
@@ -173,19 +183,19 @@ fun CalendarScreen(
             }
 
             // 日付の表示
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             val daysInWeek = 7
             val emptySlots = firstDayOfWeek - 1
 
             Column(
-                modifier = Modifier.fillMaxHeight(0.8f)
+                modifier = Modifier.fillMaxSize()
             ) {
                 for (week in 0..5) {
                     if( week > 0){
                         Divider(
                             color = Color.Black,
                             thickness = 1.dp,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 0.5.dp)
                         )
                     }
                     Row(
@@ -202,34 +212,61 @@ fun CalendarScreen(
                                     (day == 7) -> Color.Blue
                                     else -> Color.Black
                                 }
-                                TextButton(
-                                    onClick = { navController.navigate("record/$currentYear/$currentMonth/$currentDayInCell") },
+
+                                Card(
                                     modifier = Modifier
-                                        .padding(0.5.dp)
-                                        .weight(1f)
+                                        .height(100.dp)
+                                        .width(50.dp)
+                                        .clickable { navController.navigate("record/$currentYear/$currentMonth/$currentDayInCell") }
                                 ) {
                                     Box(
                                         modifier = Modifier
-                                            .size(50.dp)
-                                            .let {
-                                                if (isToday) {
-                                                    it.background(Color.Red, shape = CircleShape)
-                                                } else {
-                                                    it
-                                                }
-                                            },
-                                        contentAlignment = Alignment.Center
+                                            .fillMaxSize()
+                                            .background(Color(0xFFF8F8FF))
                                     ) {
-                                        Text(
-                                            text = currentDayInCell.toString(),
-                                            style = MaterialTheme.typography.bodyMedium.copy(
-                                                fontSize = 25.sp,
-                                                color = if (isToday) Color.White else textColor
+
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier
+                                                .align(Alignment.TopStart)
+                                                .size(35.dp)
+                                                .padding(start = 5.dp, top = 8.dp)
+                                                .background(
+                                                    color = if (isToday) Color.Red else Color.Transparent,
+                                                    shape = CircleShape
+                                                )
+                                        ) {
+                                            Text(
+                                                text = currentDayInCell.toString(),
+                                                style = MaterialTheme.typography.bodyMedium.copy(
+                                                    fontSize = 20.sp,
+                                                    color = if (isToday) Color.White else textColor
+                                                ),
+                                                modifier = Modifier.align(Alignment.Center)
                                             )
+                                        }
+
+                                        Spacer(modifier = Modifier.height(5.dp))
+
+
+                                        Text(
+                                            text = """
+                                                記録なし
+                                                記録なし２
+                                                """
+                                                .trimIndent(),
+
+
+                                            style = MaterialTheme.typography.bodySmall.copy(
+                                                fontSize = 12.sp,
+                                                color = Color.Black
+                                            ),
+                                            modifier = Modifier
+                                                .align(Alignment.BottomCenter)
+                                                .padding(bottom = 8.dp)
                                         )
                                     }
                                 }
-
                             } else {
                                 Spacer(modifier = Modifier.weight(1f))
                             }
