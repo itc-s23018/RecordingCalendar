@@ -7,12 +7,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,7 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,13 +25,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,7 +40,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.NotificationCompat.Style
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import jp.ac.it_college.std.s23018.recordingcalendar.R
@@ -54,7 +47,6 @@ import jp.ac.it_college.std.s23018.recordingcalendar.RecordingCalendarApplicatio
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import java.text.DateFormatSymbols
 import java.time.LocalDate
@@ -104,6 +96,8 @@ fun CalendarScreen(
 
     val weightRecords = remember { mutableStateOf<Map<LocalDate, WeightEntity>>(emptyMap()) }
 
+    val motionsRecords = remember { mutableStateOf<Map<LocalDate, MotionEntity>>(emptyMap()) }
+
     val app = navController.context.applicationContext as RecordingCalendarApplication
     val db = app.container.recordRepository
 
@@ -111,11 +105,16 @@ fun CalendarScreen(
         val startDate = LocalDate.of(currentYear, currentMonth, 1)
         val endDate = startDate.withDayOfMonth(startDate.lengthOfMonth())
 
-        val records = withContext(Dispatchers.IO) {
+        val weightrecords = withContext(Dispatchers.IO) {
             db.getWeightsByMonth(startDate.toString(), endDate.toString())
         }.associateBy { LocalDate.parse(it.date) }
 
-        weightRecords.value = records
+        val motionsrecords = withContext(Dispatchers.IO){
+            db.getMotionsByMonth(startDate.toString(), endDate.toString())
+        } .associateBy { LocalDate.parse(it.date) }
+
+        weightRecords.value = weightrecords
+        motionsRecords.value = motionsrecords
     }
 
 
@@ -274,34 +273,31 @@ fun CalendarScreen(
                                             )
                                         }
 
-                                        Spacer(modifier = Modifier.height(5.dp))
-
-                                        val recordForDay = weightRecords.value[LocalDate.of(currentYear, currentMonth, currentDayInCell)]
-
-                                       if(recordForDay != null){
-                                           Text(
-                                               text = "${recordForDay.weight}Kg",
-                                               style = MaterialTheme.typography.bodySmall.copy(
-                                                   fontSize = 12.sp
-                                               ),
-                                               modifier = Modifier
-                                                   .align(Alignment.BottomCenter)
-                                                   .padding(bottom = 8.dp)
-                                           )
-                                       } else {
-                                           Text(
-                                               text = "記録なし",
-                                               style = MaterialTheme.typography.bodySmall.copy(
-                                                   fontSize = 12.sp
-                                               ),
-                                               modifier = Modifier
-                                                   .align(Alignment.BottomCenter)
-                                                   .padding(bottom = 8.dp)
-                                           )
-                                       }
 
 
+                                        val weightRecordForDay = weightRecords.value[LocalDate.of(currentYear, currentMonth, currentDayInCell)]
+                                        val motionsRecordForDay = motionsRecords.value[LocalDate.of(currentYear, currentMonth, currentDayInCell)]
 
+                                        val combinedText = buildString {
+                                            if(weightRecordForDay != null) {
+                                                append("${weightRecordForDay.weight}Kg\n")
+                                            }
+                                            if(motionsRecordForDay != null){
+                                                append("${motionsRecordForDay.name} ${motionsRecordForDay.time}分")
+                                            }
+                                        }
+
+                                        if(combinedText.isNotEmpty()) {
+                                            Text(
+                                                text = combinedText,
+                                                style = MaterialTheme.typography.bodySmall.copy(
+                                                    fontSize = 12.sp
+                                                ),
+                                                modifier = Modifier
+                                                    .align(Alignment.BottomCenter)
+                                                    .padding(bottom = 8.dp)
+                                            )
+                                        }
                                     }
                                 }
                             } else {
