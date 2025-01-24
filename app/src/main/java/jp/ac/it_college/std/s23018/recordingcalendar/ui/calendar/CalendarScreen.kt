@@ -19,6 +19,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.DirectionsBike
+import androidx.compose.material.icons.filled.DirectionsRun
+import androidx.compose.material.icons.filled.Pool
+import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -119,6 +123,14 @@ fun CalendarScreen(
         weightRecords.value = weightrecords
         motionsRecords.value = motionsrecords
     }
+
+    //運動名をアイコンで表示させる
+    val motionsIcons = mapOf(
+        "Running" to Icons.Default.DirectionsRun,
+        "Swimming" to Icons.Default.Pool,
+        "Cycling" to Icons.Default.DirectionsBike,
+        "Yoga" to Icons.Default.SelfImprovement
+    )
 
 
 
@@ -244,7 +256,7 @@ fun CalendarScreen(
                                 Card(
                                     modifier = Modifier
                                         .height(100.dp)
-                                        .width(50.dp)
+                                        .width(55.dp)
                                         .clickable { navController.navigate("record/$currentYear/$currentMonth/$currentDayInCell") }
                                 ) {
                                     Box(
@@ -267,15 +279,12 @@ fun CalendarScreen(
                                             Text(
                                                 text = currentDayInCell.toString(),
                                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                                    fontSize = 20.sp,
+                                                    fontSize = 18.sp,
                                                     color = if (isToday) Color.White else textColor
                                                 ),
                                                 modifier = Modifier.align(Alignment.Center)
                                             )
                                         }
-
-
-
 
                                         val weightRecordForDay = weightRecords.value[LocalDate.of(currentYear,currentMonth,currentDayInCell)]
                                         val motionRecordsForDay = motionsRecords.value[LocalDate.of(currentYear,currentMonth,currentDayInCell)]?.firstOrNull()
@@ -295,22 +304,41 @@ fun CalendarScreen(
                                                         color = Color.White
                                                     ),
                                                     modifier = Modifier
-                                                        .background(Color(0xFF4169e1))
+                                                        .background(Color(0xFF4169e1), shape = RoundedCornerShape(3.dp))
                                                         .padding(4.dp)
                                                 )
                                             }
 
 
                                             if (motionRecordsForDay != null) {
-                                                Spacer(modifier = Modifier.height(5.dp))
-                                                Text(
-                                                    text = "${motionRecordsForDay.name} ${motionRecordsForDay.time}分",
-                                                    style = MaterialTheme.typography.bodySmall.copy(
-                                                        fontSize = 12.sp
-                                                    ),
+                                                Row(
                                                     modifier = Modifier
-                                                        .background(Color(0xFF00ff7f))
-                                                )
+                                                        .padding(top = 5.dp)
+                                                        .background(Color(0xFF00ff7f), shape = RoundedCornerShape(3.dp))
+                                                ) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .size(18.dp)
+                                                            .background(Color.White, shape = CircleShape),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        val motionIcon =
+                                                            motionsIcons[motionRecordsForDay.name]
+                                                        if (motionIcon != null) {
+                                                            Icon(
+                                                                imageVector = motionIcon,
+                                                                contentDescription = motionRecordsForDay.name,
+                                                                modifier = Modifier.size((15.dp))
+                                                            )
+                                                        }
+                                                    }
+                                                    Text(
+                                                        text = "${motionRecordsForDay.time}分",
+                                                        style = MaterialTheme.typography.bodySmall.copy(
+                                                            fontSize = 13.sp
+                                                        )
+                                                    )
+                                                }
                                             }
                                         }
                                     }
