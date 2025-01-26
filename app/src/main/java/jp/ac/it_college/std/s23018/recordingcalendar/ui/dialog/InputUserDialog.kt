@@ -31,7 +31,7 @@ fun InputUserDialog(
 
 
     var inputName by remember { mutableStateOf("") }
-    var inputCurrentWeight by remember { mutableStateOf("") }
+    var inputWeight by remember { mutableStateOf("") }
     var inputTargetWeight by remember { mutableStateOf("") }
 
     AlertDialog(
@@ -59,10 +59,10 @@ fun InputUserDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedTextField(
-                        value = inputCurrentWeight,
+                        value = inputWeight,
                         onValueChange = { newValue ->
                             if (newValue.isEmpty() || newValue.matches(Regex("^\\d*\\.?\\d*$"))) {
-                                inputCurrentWeight = newValue
+                                inputWeight = newValue
                             }
                         },
                         label = { Text("現在の体重を入力") },
@@ -105,8 +105,8 @@ fun InputUserDialog(
         },
         confirmButton = {
             TextButton(onClick = {
-                if(inputName.isNotEmpty() && inputTargetWeight.isNotEmpty() && inputTargetWeight.isNotEmpty()){
-                    onConfirm(inputName, inputCurrentWeight.toFloat(), inputTargetWeight.toFloat())
+                if(inputName.isNotEmpty() && inputWeight.isNotEmpty() && inputTargetWeight.isNotEmpty()){
+                    onConfirm(inputName, inputWeight.toFloat(), inputTargetWeight.toFloat())
                 }
             }) {
                 Text(text = "保存")

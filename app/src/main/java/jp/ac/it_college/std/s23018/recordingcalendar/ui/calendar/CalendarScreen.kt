@@ -1,5 +1,6 @@
 package jp.ac.it_college.std.s23018.recordingcalendar.ui.calendar
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.Pool
 import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,11 +35,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -52,16 +52,18 @@ import androidx.navigation.compose.rememberNavController
 import jp.ac.it_college.std.s23018.recordingcalendar.R
 import jp.ac.it_college.std.s23018.recordingcalendar.RecordingCalendarApplication
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
+import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.UserEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
+import jp.ac.it_college.std.s23018.recordingcalendar.ui.dialog.InputUserDialog
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.DateFormatSymbols
 import java.time.LocalDate
 import java.util.Calendar
 import java.util.Locale
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(
     navigateRecordEntry: () -> Unit = {},
@@ -106,18 +108,18 @@ fun CalendarScreen(
     val motionsRecords = remember { mutableStateOf<Map<LocalDate, List<MotionEntity>>>(emptyMap()) }
 
     val app = navController.context.applicationContext as RecordingCalendarApplication
-    val db = app.container.recordRepository
+    val record_db = app.container.recordRepository
 
     LaunchedEffect(currentYear, currentMonth) {
         val startDate = LocalDate.of(currentYear, currentMonth, 1)
         val endDate = startDate.withDayOfMonth(startDate.lengthOfMonth())
 
         val weightrecords = withContext(Dispatchers.IO) {
-            db.getWeightsByMonth(startDate.toString(), endDate.toString())
+            record_db.getWeightsByMonth(startDate.toString(), endDate.toString())
         }.associateBy { LocalDate.parse(it.date) }
 
         val motionsrecords = withContext(Dispatchers.IO) {
-            db.getMotionsByMonth(startDate.toString(), endDate.toString())
+            record_db.getMotionsByMonth(startDate.toString(), endDate.toString())
         }.groupBy { LocalDate.parse(it.date) }
 
         weightRecords.value = weightrecords
@@ -131,6 +133,39 @@ fun CalendarScreen(
         "Cycling" to Icons.Default.DirectionsBike,
         "Yoga" to Icons.Default.SelfImprovement
     )
+
+    //ユーザー登録
+    var userInformation by remember { mutableStateOf<UserEntity?>(null) }
+    var showUserInputDialog by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val user_db = app.container.userRepository
+
+    fun handleUserConfirm(name: String, weight: Float, targetWeight: Float) {
+        coroutineScope.launch {
+            user_db.insertUser(
+                UserEntity(
+                    name = name,
+                    weight = weight,
+                    targetWeight = targetWeight
+                )
+            )
+            Toast.makeText(context, "ユーザー情報を登録しました", Toast.LENGTH_SHORT).show()
+            showUserInputDialog = false
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            val user = user_db.getUser().firstOrNull()
+            if (user != null) {
+                userInformation = user
+            } else {
+                showUserInputDialog = true
+            }
+        }
+    }
 
 
 
@@ -147,6 +182,16 @@ fun CalendarScreen(
             }
         }
     ) { innerPadding ->
+
+        if(showUserInputDialog) {
+            InputUserDialog(onConfirm = {name, weight, targetWeight ->
+                handleUserConfirm(name = name, weight = weight, targetWeight = targetWeight)
+            },
+                onDismiss = {showUserInputDialog = false}
+            )
+        }
+
+
         Column(
             modifier = modifier
                 .fillMaxSize()
