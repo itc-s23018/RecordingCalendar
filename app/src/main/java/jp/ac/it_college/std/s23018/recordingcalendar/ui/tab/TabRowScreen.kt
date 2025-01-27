@@ -53,7 +53,9 @@ fun TabRowScreen(
                     navController = navController
                 )// カレンダー画面
                 1 -> GraphScreen() // グラフ画面
-                2 -> UserScreen() // ユーザー画面
+                2 -> UserScreen(
+                    navController = navController
+                ) // ユーザー画面
             }
         }
     }

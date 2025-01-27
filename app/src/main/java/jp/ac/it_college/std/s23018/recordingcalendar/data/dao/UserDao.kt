@@ -15,6 +15,6 @@ interface UserDao {
     @Update //ユーザー情報編集
     suspend fun update(user: UserEntity)
 
-    @Query("SELECT * FROM user WHERE id = :id") //ユーザー情報表示（ユーザー画面）
-    fun getUser(id: Int): Flow<UserEntity>
+    @Query("SELECT * FROM user LIMIT 1") //ユーザー情報表示（ユーザー画面）
+    suspend fun getUser(): UserEntity
 }

@@ -13,5 +13,6 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun updateUser(user: UserEntity) = dao.update(user)
 
-    override suspend fun getUser(): Flow<UserEntity>  = dao.getUser(1)
+    override suspend fun getUser(): UserEntity  = dao.getUser()
+
 }

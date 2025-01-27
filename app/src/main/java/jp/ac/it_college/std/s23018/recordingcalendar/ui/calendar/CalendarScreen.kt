@@ -158,7 +158,7 @@ fun CalendarScreen(
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            val user = user_db.getUser().firstOrNull()
+            val user = user_db.getUser()
             if (user != null) {
                 userInformation = user
             } else {
