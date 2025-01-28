@@ -46,7 +46,7 @@ fun EditWeightDialog(
                         OutlinedTextField(
                             value = selectedWeight,
                             onValueChange = { newValue ->
-                               if(newValue.toFloatOrNull() != null){
+                               if(newValue.isEmpty() || newValue.toFloatOrNull() != null){
                                    selectedWeight = newValue
                                }
                             },

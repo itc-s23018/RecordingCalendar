@@ -1,5 +1,7 @@
 package jp.ac.it_college.std.s23018.recordingcalendar.ui.user
 
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,7 +35,9 @@ import androidx.navigation.NavController
 import jp.ac.it_college.std.s23018.recordingcalendar.R
 import jp.ac.it_college.std.s23018.recordingcalendar.RecordingCalendarApplication
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.UserEntity
+import jp.ac.it_college.std.s23018.recordingcalendar.ui.dialog.EditUserDialog
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -49,13 +54,30 @@ fun UserScreen(
     val app = navController.context.applicationContext as RecordingCalendarApplication
     val db = app.container.userRepository
 
+    val coroutineScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+
+    var showEditUserDialog by remember { mutableStateOf(false) }
+
+    var userToEdit by remember { mutableStateOf<UserEntity?>(null) }
+
+
+
+    fun refreshData() {
+        coroutineScope.launch {
+            val updatedUser = withContext(Dispatchers.IO){
+                db.getUser()
+            }
+            userInformation = updatedUser
+        }
+    }
 
     LaunchedEffect(Unit) {
-        val userData = withContext(Dispatchers.IO){
-            db.getUser()
-        }
-        userInformation = userData
+        refreshData()
     }
+
+
 
 
     Scaffold(
@@ -127,10 +149,57 @@ fun UserScreen(
                                 )
                             }
                             Divider(color = Color.Gray, thickness = 5.dp)
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                Text(
+                                    text = "編集する",
+                                    fontSize = 15.sp,
+                                    color = Color.Gray,
+                                    modifier = Modifier
+                                        .padding(start = 5.dp)
+                                        .clickable {
+                                            userToEdit = user
+                                            showEditUserDialog = true
+                                        }
+                                )
+
+                                if (showEditUserDialog && userToEdit != null) {
+                                    EditUserDialog(
+                                        onConfirm = { name, weight, targetWeight ->
+                                            coroutineScope.launch {
+                                                db.updateUser(
+                                                    userToEdit!!.copy(
+                                                        name = name,
+                                                        weight = weight,
+                                                        targetWeight = targetWeight
+                                                    )
+                                                )
+                                                Toast.makeText(
+                                                    context,
+                                                    "ユーザー情報を更新しました",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                refreshData()
+                                            }
+                                            showEditUserDialog = false
+                                        },
+                                        onDismiss = { showEditUserDialog = false },
+                                        initialName = userToEdit!!.name,
+                                        initialWeight = userToEdit!!.weight,
+                                        initialTargetWeight = userToEdit!!.targetWeight,
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
-        },
+        }
     )
 }
+
