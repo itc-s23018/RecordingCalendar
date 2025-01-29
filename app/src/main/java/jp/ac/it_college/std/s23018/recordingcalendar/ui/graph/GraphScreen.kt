@@ -59,6 +59,12 @@ fun GraphScreen(
                 selectedTabIndex,
                 onTabSelected = { index -> selectedTabIndex = index}
             )
+
+            when(selectedTabIndex){
+                0 -> WeekGraphScreen()
+                1 -> MonthGraphScreen()
+                2 -> YearGraphScreen()
+            }
         }
     }
 
