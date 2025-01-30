@@ -65,7 +65,7 @@ fun GraphScreen(
             when(selectedTabIndex){
                 0 -> WeekGraphScreen(navController = navController)
                 1 -> MonthGraphScreen(navController = navController)
-                2 -> YearGraphScreen()
+                2 -> YearGraphScreen(navController = navController)
             }
         }
     }
