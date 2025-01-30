@@ -27,12 +27,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import jp.ac.it_college.std.s23018.recordingcalendar.R
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.tab.GraphTab
 
 @Composable
 fun GraphScreen(
-    modifier: Modifier = Modifier,
+    navController: NavController,
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
 
@@ -61,7 +63,7 @@ fun GraphScreen(
             )
 
             when(selectedTabIndex){
-                0 -> WeekGraphScreen()
+                0 -> WeekGraphScreen(navController = navController)
                 1 -> MonthGraphScreen()
                 2 -> YearGraphScreen()
             }
@@ -75,5 +77,6 @@ fun GraphScreen(
 @Preview(showBackground = true)
 @Composable
 private fun GraphScreenPreview(){
-    GraphScreen()
+    val navController = rememberNavController()
+    GraphScreen(navController)
 }

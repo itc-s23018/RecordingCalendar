@@ -52,7 +52,9 @@ fun TabRowScreen(
                 0 -> CalendarScreen(
                     navController = navController
                 )// カレンダー画面
-                1 -> GraphScreen() // グラフ画面
+                1 -> GraphScreen(
+                    navController = navController
+                ) // グラフ画面
                 2 -> UserScreen(
                     navController = navController
                 ) // ユーザー画面
