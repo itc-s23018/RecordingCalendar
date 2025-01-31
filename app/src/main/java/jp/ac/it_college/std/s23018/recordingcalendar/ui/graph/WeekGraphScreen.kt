@@ -55,6 +55,16 @@ fun WeekGraphScreen(
        mutableStateOf(userInformation)
     }
 
+    val weekWeightData = listOf(
+        64.5f,
+        63.8f,
+        61.0f,
+        64.2f,
+        64.3f,
+        64.1f,
+        70.0f
+    )
+
     val app = navController.context.applicationContext as RecordingCalendarApplication
     val db = app.container.userRepository
 
@@ -153,27 +163,57 @@ fun WeekGraphScreen(
                 strokeWidth = 5f
             )
 
-            // ユーザー体重±2の範囲を設定
+
             val weightMax = (userInfo?.weight ?: 0f) + 2f
             val weightMin = (userInfo?.weight ?: 0f) - 2f
             val weightRange = weightMax - weightMin
 
-            // 体重の目盛りの間隔（y軸のステップ高さ）
+
             val yStepHeight = (yAxisEnd.y - yAxisStart.y) / weightRange
 
-            // 体重ラベルを下から上に表示
             for (i in 0..(weightRange.toInt())) {
-                val weightLabel = weightMin + i // 下から順に描画
+                val weightLabel = weightMin + i
                 val yPos = yAxisEnd.y - (i * yStepHeight)
 
                 drawContext.canvas.nativeCanvas.drawText(
                     "${weightLabel.toInt()}",
                     yAxisStart.x - 20f,
                     yPos,
-                    android.graphics.Paint().apply {
+                    Paint().apply {
                         color = if (i == weightRange.toInt() / 2) Color.Blue.toArgb() else Color.Black.toArgb()
                         textSize = 50f
                         textAlign = android.graphics.Paint.Align.RIGHT
+                    }
+                )
+            }
+
+            weekWeightData.forEachIndexed { index, weight ->
+                val xPos = 90f + xStep * index + offset
+                val weightPos =   when{
+                    weight < weightMin -> 0f
+                    weight > weightMax -> weightMax - weightMin
+                    else -> weight - weightMin
+                }
+
+                val weightYPos = yAxisEnd.y - (weightPos * yStepHeight)
+
+
+                drawCircle(
+                    color = Color.Black,
+                    radius = 20f,
+                    center = Offset(xPos, weightYPos)
+                )
+
+                // 体重の数値を表示
+                val weightText = " ${"%.1f".format(weight)}"
+                drawContext.canvas.nativeCanvas.drawText(
+                    weightText,
+                    xPos,
+                    weightYPos + 60f,
+                    Paint().apply {
+                        color = Color.Black.toArgb()
+                        textSize = 50f
+                        textAlign = android.graphics.Paint.Align.CENTER
                     }
                 )
             }
