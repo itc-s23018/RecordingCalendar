@@ -4,6 +4,7 @@ import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import jp.ac.it_college.std.s23018.recordingcalendar.RecordingCalendarApplication
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.UserEntity
+import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -50,34 +52,34 @@ fun WeekGraphScreen(
     val startOfWeek = selectedDate.with(DayOfWeek.MONDAY)
     val endOfWeek = startOfWeek.plusDays(6)
 
-    //ユーザー情報の体重情報を取得
+    // ユーザー情報の体重情報を取得
     var userInfo by remember {
-       mutableStateOf(userInformation)
+        mutableStateOf(userInformation)
     }
 
-    val weekWeightData = listOf(
-        64.5f,
-        63.8f,
-        61.0f,
-        64.2f,
-        64.3f,
-        64.1f,
-        70.0f
-    )
+    var weights by remember {
+        mutableStateOf<List<WeightEntity>>(emptyList())
+    }
 
     val app = navController.context.applicationContext as RecordingCalendarApplication
-    val db = app.container.userRepository
+    val user_db = app.container.userRepository
+    val weight_db = app.container.recordRepository
 
     val coroutineScope = rememberCoroutineScope()
 
-
     LaunchedEffect(true) {
         coroutineScope.launch {
-            val fetchedUser = db.getUser()
+            val fetchedUser = user_db.getUser()
             userInfo = fetchedUser
+
+            val startDate = startOfWeek.format(DateTimeFormatter.ISO_DATE)
+            val endDate = endOfWeek.format(DateTimeFormatter.ISO_DATE)
+
+            weights = weight_db.getWeightOfWeek(startDate, endDate)
         }
     }
 
+    // 週の日付表示
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -108,10 +110,9 @@ fun WeekGraphScreen(
                 contentDescription = "Next Week"
             )
         }
-
     }
 
-    //体重の軸
+    // 体重の軸
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -164,8 +165,8 @@ fun WeekGraphScreen(
             )
 
 
-            val weightMax = (userInfo?.weight ?: 0f) + 2f
-            val weightMin = (userInfo?.weight ?: 0f) - 2f
+            val weightMax = ((userInfo?.weight ?: 0f) + 2f).toFloat()
+            val weightMin = ((userInfo?.weight ?: 0f) - 2f).toFloat()
             val weightRange = weightMax - weightMin
 
 
@@ -187,35 +188,69 @@ fun WeekGraphScreen(
                 )
             }
 
-            weekWeightData.forEachIndexed { index, weight ->
+            // 体重データを曜日に合わせて表示
+            val dateRange = generateSequence(startOfWeek) { it.plusDays(1) }
+                .takeWhile { !it.isAfter(endOfWeek) }
+                .toList()
+
+            val weightMap = weights.associateBy { LocalDate.parse(it.date) }
+
+            val datas = mutableListOf<Offset>()
+
+            dateRange.forEachIndexed { index, date ->
                 val xPos = 90f + xStep * index + offset
-                val weightPos =   when{
-                    weight < weightMin -> 0f
-                    weight > weightMax -> weightMax - weightMin
-                    else -> weight - weightMin
+                val weightEntity = weightMap[date]
+
+                val weightAsFloat = weightEntity?.weight?.toFloat() ?: 0f
+
+                val weightPos = when {
+                    weightAsFloat < weightMin -> 0f
+                    weightAsFloat > weightMax -> (weightMax - weightMin)
+                    else -> (weightAsFloat - weightMin)
                 }
 
-                val weightYPos = yAxisEnd.y - (weightPos * yStepHeight)
+                val weightYPos = if (weightEntity != null) {
+                    yAxisEnd.y - (weightPos * yStepHeight)
+                } else {
+                    yAxisEnd.y
+                }
 
+                val point = Offset(xPos, weightYPos)
+                datas.add(point)
 
                 drawCircle(
-                    color = Color.Black,
+                    color = if (weightEntity != null) Color.Black else Color.Gray,
                     radius = 20f,
                     center = Offset(xPos, weightYPos)
                 )
 
                 // 体重の数値を表示
-                val weightText = " ${"%.1f".format(weight)}"
+                val weightText = if (weightEntity != null) {
+                    " ${"%.1f".format(weightAsFloat)}"
+                } else {
+                    ""
+                }
                 drawContext.canvas.nativeCanvas.drawText(
                     weightText,
                     xPos,
-                    weightYPos + 60f,
+                    weightYPos - 40f,
                     Paint().apply {
                         color = Color.Black.toArgb()
                         textSize = 50f
                         textAlign = android.graphics.Paint.Align.CENTER
                     }
                 )
+
+                if (datas.size > 1) {
+                    val previousPoint = datas[datas.size - 2]
+                    drawLine(
+                        color = Color.Black,
+                        start = previousPoint,
+                        end = point,
+                        strokeWidth = 5f
+                    )
+                }
+
             }
         }
     }
