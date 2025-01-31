@@ -29,11 +29,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import jp.ac.it_college.std.s23018.recordingcalendar.RecordingCalendarApplication
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.UserEntity
 import kotlinx.coroutines.launch
@@ -53,8 +51,8 @@ fun WeekGraphScreen(
     val endOfWeek = startOfWeek.plusDays(6)
 
     //ユーザー情報の体重情報を取得
-    var userInformation by remember {
-        mutableStateOf<UserEntity?>(null)
+    var userInfo by remember {
+       mutableStateOf(userInformation)
     }
 
     val app = navController.context.applicationContext as RecordingCalendarApplication
@@ -66,7 +64,7 @@ fun WeekGraphScreen(
     LaunchedEffect(true) {
         coroutineScope.launch {
             val fetchedUser = db.getUser()
-            userInformation = fetchedUser
+            userInfo = fetchedUser
         }
     }
 
@@ -86,7 +84,7 @@ fun WeekGraphScreen(
         }
 
         Text(
-           text = "${startOfWeek.format(DateTimeFormatter.ofPattern("M月d日"))}〜${endOfWeek.format(DateTimeFormatter.ofPattern("M月d日"))}",
+            text = "${startOfWeek.format(DateTimeFormatter.ofPattern("M月d日"))}〜${endOfWeek.format(DateTimeFormatter.ofPattern("M月d日"))}",
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
@@ -155,19 +153,25 @@ fun WeekGraphScreen(
                 strokeWidth = 5f
             )
 
-            val weightRange = 6
-            val yStepHeight = (yAxisEnd.y - yAxisStart.y) / weightRange -1
+            // ユーザー体重±2の範囲を設定
+            val weightMax = (userInfo?.weight ?: 0f) + 2f
+            val weightMin = (userInfo?.weight ?: 0f) - 2f
+            val weightRange = weightMax - weightMin
 
-            for (i in -2..2) {
-                val weightLabel = userInformation?.weight?.plus(i) ?: 0f
-                val yPos = yAxisEnd.y - (i + 3) * yStepHeight
+            // 体重の目盛りの間隔（y軸のステップ高さ）
+            val yStepHeight = (yAxisEnd.y - yAxisStart.y) / weightRange
+
+            // 体重ラベルを下から上に表示
+            for (i in 0..(weightRange.toInt())) {
+                val weightLabel = weightMin + i // 下から順に描画
+                val yPos = yAxisEnd.y - (i * yStepHeight)
 
                 drawContext.canvas.nativeCanvas.drawText(
                     "${weightLabel.toInt()}",
                     yAxisStart.x - 20f,
                     yPos,
                     android.graphics.Paint().apply {
-                        color = if( i == 0) Color.Blue.toArgb() else Color.Black.toArgb()
+                        color = if (i == weightRange.toInt() / 2) Color.Blue.toArgb() else Color.Black.toArgb()
                         textSize = 50f
                         textAlign = android.graphics.Paint.Align.RIGHT
                     }
@@ -175,18 +179,4 @@ fun WeekGraphScreen(
             }
         }
     }
-
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun WeekGraphScrrenPreview() {
-    val dummyNavController = rememberNavController()
-    val dummyUser = UserEntity(
-        id = 1,
-        name = "テスト",
-        weight = 65.0f,
-        targetWeight = 60.0f
-    )
-    WeekGraphScreen(navController = dummyNavController, userInformation = dummyUser)
 }

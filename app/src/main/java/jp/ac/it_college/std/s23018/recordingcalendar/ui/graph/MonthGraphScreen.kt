@@ -42,11 +42,14 @@ import java.time.temporal.TemporalAdjusters
 @Composable
 fun MonthGraphScreen(
     navController: NavController,
+    userInformation: UserEntity? = null
 ) {
     var currentMonthAndYear by remember { mutableStateOf(LocalDate.now()) }
 
     // ユーザー情報の体重
-    var userInformation by remember { mutableStateOf<UserEntity?>(null) }
+    var userInfo by remember {
+        mutableStateOf(userInformation)
+    }
 
     val app = navController.context.applicationContext as RecordingCalendarApplication
     val db = app.container.userRepository
@@ -56,7 +59,7 @@ fun MonthGraphScreen(
     LaunchedEffect(true) {
         coroutineScope.launch {
             val fetchedUser = db.getUser()
-            userInformation = fetchedUser
+            userInfo = fetchedUser
         }
     }
 
@@ -147,19 +150,25 @@ fun MonthGraphScreen(
                 strokeWidth = 5f
             )
 
-            val weightRange = 6
-            val yStepHeight = (yAxisEnd.y - yAxisStart.y) / weightRange - 1
+            // ユーザー体重±2の範囲を設定
+            val weightMax = (userInfo?.weight ?: 0f) + 2f
+            val weightMin = (userInfo?.weight ?: 0f) - 2f
+            val weightRange = weightMax - weightMin
 
-            for (i in -2..2) {
-                val weightLabel = userInformation?.weight?.plus(i) ?: 0f
-                val yPos = yAxisEnd.y - (i + 3) * yStepHeight
+            // 体重の目盛りの間隔（y軸のステップ高さ）
+            val yStepHeight = (yAxisEnd.y - yAxisStart.y) / weightRange
+
+            // 体重ラベルを下から上に表示
+            for (i in 0..(weightRange.toInt())) {
+                val weightLabel = weightMin + i // 下から順に描画
+                val yPos = yAxisEnd.y - (i * yStepHeight)
 
                 drawContext.canvas.nativeCanvas.drawText(
                     "${weightLabel.toInt()}",
                     yAxisStart.x - 20f,
                     yPos,
                     android.graphics.Paint().apply {
-                        color = if (i == 0) Color.Blue.toArgb() else Color.Black.toArgb()
+                        color = if (i == weightRange.toInt() / 2) Color.Blue.toArgb() else Color.Black.toArgb()
                         textSize = 50f
                         textAlign = android.graphics.Paint.Align.RIGHT
                     }

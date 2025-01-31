@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -37,16 +36,16 @@ import jp.ac.it_college.std.s23018.recordingcalendar.RecordingCalendarApplicatio
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.UserEntity
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun YearGraphScreen(
-    navController: NavController
+    navController: NavController,
+    userInformation: UserEntity? = null
 ) {
     var selectedYaer by remember { mutableStateOf(LocalDate.now())}
 
-    var userInformation by remember {
-        mutableStateOf<UserEntity?>(null)
+    var userInfo by remember {
+        mutableStateOf(userInformation)
     }
 
     val app = navController.context.applicationContext as RecordingCalendarApplication
@@ -58,7 +57,7 @@ fun YearGraphScreen(
     LaunchedEffect(true) {
         coroutineScope.launch {
             val fetchedUser = db.getUser()
-            userInformation = fetchedUser
+            userInfo = fetchedUser
         }
     }
 
@@ -131,8 +130,8 @@ fun YearGraphScreen(
 
 
             // 縦軸（体重）
-            val yAxisStart = Offset(70f, 100f)
-            val yAxisEnd = Offset(70f, size.height - 100f)
+            val yAxisStart = Offset(95f, 100f)
+            val yAxisEnd = Offset(95f, size.height - 100f)
             drawLine(
                 color = Color.Black,
                 start = yAxisStart,
@@ -140,19 +139,25 @@ fun YearGraphScreen(
                 strokeWidth = 5f
             )
 
-            val weightRange = 6
-            val yStepHeight = (yAxisEnd.y - yAxisStart.y) / weightRange -1
+            // ユーザー体重±2の範囲を設定
+            val weightMax = (userInfo?.weight ?: 0f) + 2f
+            val weightMin = (userInfo?.weight ?: 0f) - 2f
+            val weightRange = weightMax - weightMin
 
-            for (i in -2..2) {
-                val weightLabel = userInformation?.weight?.plus(i) ?: 0f
-                val yPos = yAxisEnd.y - (i + 3) * yStepHeight
+            // 体重の目盛りの間隔（y軸のステップ高さ）
+            val yStepHeight = (yAxisEnd.y - yAxisStart.y) / weightRange
+
+            // 体重ラベルを下から上に表示
+            for (i in 0..(weightRange.toInt())) {
+                val weightLabel = weightMin + i // 下から順に描画
+                val yPos = yAxisEnd.y - (i * yStepHeight)
 
                 drawContext.canvas.nativeCanvas.drawText(
                     "${weightLabel.toInt()}",
                     yAxisStart.x - 20f,
                     yPos,
                     android.graphics.Paint().apply {
-                        color = if( i == 0) Color.Blue.toArgb() else Color.Black.toArgb()
+                        color = if (i == weightRange.toInt() / 2) Color.Blue.toArgb() else Color.Black.toArgb()
                         textSize = 50f
                         textAlign = android.graphics.Paint.Align.RIGHT
                     }
