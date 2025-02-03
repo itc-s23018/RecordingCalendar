@@ -36,7 +36,9 @@ import androidx.navigation.NavController
 import jp.ac.it_college.std.s23018.recordingcalendar.RecordingCalendarApplication
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.UserEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -57,6 +59,7 @@ fun WeekGraphScreen(
         mutableStateOf(userInformation)
     }
 
+    //記録画面に記録されている体重データ
     var weights by remember {
         mutableStateOf<List<WeightEntity>>(emptyList())
     }
@@ -67,16 +70,25 @@ fun WeekGraphScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(true) {
+    fun refreshData() {
         coroutineScope.launch {
-            val fetchedUser = user_db.getUser()
+            val fetchedUser = withContext(Dispatchers.IO) { user_db.getUser() }
             userInfo = fetchedUser
 
             val startDate = startOfWeek.format(DateTimeFormatter.ISO_DATE)
             val endDate = endOfWeek.format(DateTimeFormatter.ISO_DATE)
 
-            weights = weight_db.getWeightOfWeek(startDate, endDate)
+            val weightData = withContext(Dispatchers.IO) { weight_db.getWeightOfWeek(startDate, endDate) }
+            weights = weightData
         }
+    }
+
+    LaunchedEffect(Unit) {
+        refreshData()
+    }
+
+    LaunchedEffect(selectedDate) {
+        refreshData()
     }
 
     // 週の日付表示
