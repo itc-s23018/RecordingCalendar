@@ -22,6 +22,4 @@ class RecordRepositoryImpl @Inject constructor(
     override suspend fun getMotionsByMonth(startDate: String, endDate: String): List<MotionEntity>  = dao.getMotionsByMonth(startDate, endDate)
 
     override suspend fun getWeightOfWeek(startDate: String, endDate: String): List<WeightEntity> = dao.getWeightsOfWeek(startDate,endDate)
-
-
 }

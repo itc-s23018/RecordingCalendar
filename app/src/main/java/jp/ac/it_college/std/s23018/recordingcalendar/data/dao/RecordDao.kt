@@ -42,5 +42,4 @@ interface RecordDao {
     @Query("SELECT * FROM weight WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC")
     suspend fun getWeightsOfWeek(startDate: String,endDate: String): List<WeightEntity>
 
-
 }
