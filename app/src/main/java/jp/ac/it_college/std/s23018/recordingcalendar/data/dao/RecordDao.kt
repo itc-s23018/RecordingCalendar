@@ -7,12 +7,19 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
+import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.StepEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
 import kotlinx.coroutines.flow.Flow
 import java.time.Year
 
 @Dao
 interface RecordDao {
+    @Insert//歩数記録入力
+    suspend fun stepInsert(step: StepEntity)
+
+    @Query("SELECT * FROM step WHERE date = :date")
+    fun getStepByDate(date: String): StepEntity?
+
     @Insert //体重記録入力
     suspend fun weightInsert(weight: WeightEntity)
 

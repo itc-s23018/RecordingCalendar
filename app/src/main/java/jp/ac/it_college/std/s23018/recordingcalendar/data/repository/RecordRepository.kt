@@ -1,9 +1,13 @@
 package jp.ac.it_college.std.s23018.recordingcalendar.data.repository
 
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
+import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.StepEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
 
 interface RecordRepository {
+    suspend fun insertStep(step:StepEntity)
+    suspend fun getStepByDate(date: String): StepEntity?
+
     suspend fun insertWeight(weight:WeightEntity)
     suspend fun updateWeight(weight:WeightEntity)
     suspend fun getWeightByDate(date: String):WeightEntity?
