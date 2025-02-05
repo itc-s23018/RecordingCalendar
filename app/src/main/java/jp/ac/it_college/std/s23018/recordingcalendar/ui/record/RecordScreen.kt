@@ -39,6 +39,7 @@ import androidx.navigation.NavController
 import jp.ac.it_college.std.s23018.recordingcalendar.R
 import jp.ac.it_college.std.s23018.recordingcalendar.RecordingCalendarApplication
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
+import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.StepEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.RecordingCalendarAppBar
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.dialog.DeleteMotionDialog
@@ -81,6 +82,10 @@ fun RecordScreen(
         mutableStateOf<List<MotionEntity?>>(emptyList())
     }
 
+    var stepRecord by remember {
+        mutableStateOf<StepEntity?>(null)
+    }
+
     val app = navController.context.applicationContext as RecordingCalendarApplication
     val db = app.container.recordRepository
 
@@ -112,8 +117,12 @@ fun RecordScreen(
             val motionData = withContext(Dispatchers.IO){
                 db.getMotionsByDate(selectedDate.toString())
             }
+            val stepData = withContext(Dispatchers.IO){
+                db.getStepByDate(selectedDate.toString())
+            }
             weightRecord = weightData
             motionRecord = motionData
+            stepRecord = stepData
         }
     }
 
@@ -199,6 +208,28 @@ fun RecordScreen(
                     }
                 }
 
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        "歩数:",
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "${stepRecord?.step ?: 0}歩",
+                        fontSize = 30.sp,
+                        modifier = Modifier.padding(end = 10.dp),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Divider(
+                    color = Color.Gray,
+                    thickness = 5.dp
+                )
                 weightRecord?.let { weight ->
                     Column(
                         modifier = Modifier
