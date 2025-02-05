@@ -11,7 +11,6 @@ class RecordRepositoryImpl @Inject constructor(
     private val dao: RecordDao
 ): RecordRepository  {
     override suspend fun insertStep(step: StepEntity) = dao.stepInsert(step)
-
     override suspend fun getStepByDate(date: String): StepEntity? = dao.getStepByDate(date)
 
     override suspend fun insertWeight(weight: WeightEntity) = dao.weightInsert(weight)
