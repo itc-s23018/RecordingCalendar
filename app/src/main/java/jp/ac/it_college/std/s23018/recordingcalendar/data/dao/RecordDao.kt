@@ -9,6 +9,7 @@ import androidx.room.Update
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.MotionEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
 import kotlinx.coroutines.flow.Flow
+import java.time.Year
 
 @Dao
 interface RecordDao {
@@ -42,4 +43,6 @@ interface RecordDao {
     @Query("SELECT * FROM weight WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC")
     suspend fun getWeightsOfWeek(startDate: String,endDate: String): List<WeightEntity>
 
+    @Query("SELECT * FROM weight WHERE strftime('%Y', date) = :year")
+    suspend fun getWeightsOfYear(year: String): List<WeightEntity>
 }

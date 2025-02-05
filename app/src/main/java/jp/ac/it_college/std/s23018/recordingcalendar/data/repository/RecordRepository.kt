@@ -16,4 +16,5 @@ interface RecordRepository {
     suspend fun getMotionsByMonth(startDate: String, endDate: String):List<MotionEntity>
 
     suspend fun getWeightOfWeek(startDate: String, endDate: String):List<WeightEntity>
+    suspend fun getWeightOfYear(year:String):List<WeightEntity>
 }

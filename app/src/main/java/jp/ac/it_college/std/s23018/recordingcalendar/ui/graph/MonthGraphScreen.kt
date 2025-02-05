@@ -181,7 +181,6 @@ fun MonthGraphScreen(
             mondaysInMonth.forEachIndexed { index, monday ->
                 val xPos = 90f + xStep * index + offset
 
-
                 val weekData = weights.filter { weight ->
                     val weightDate = LocalDate.parse(weight.date)
                     weightDate.isAfter(monday.minusDays(1)) && weightDate.isBefore(
