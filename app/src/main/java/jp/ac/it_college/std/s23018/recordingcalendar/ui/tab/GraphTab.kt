@@ -45,10 +45,10 @@ fun GraphTab(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 13.dp)
+            .padding(horizontal = 15.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(backgroundColor)
-            .padding(4.dp),
+            .padding(5.dp),
         horizontalArrangement = Arrangement.Center
     ){
         tabTitles.forEachIndexed{ index, title ->
@@ -59,14 +59,14 @@ fun GraphTab(
                     .clip(RoundedCornerShape(16.dp))
                     .background(if (isSelected) selectedColor else Color.Transparent)
                     .clickable { onTabSelected(index) }
-                    .padding(horizontal = 30.dp, vertical = 10.dp),
+                    .padding(horizontal = 25.dp, vertical = 10.dp),
                 contentAlignment = Alignment.Center
             ){
                 Text(
                     text = title,
                     color = if(isSelected) selectedTextColor else unselectedTabColor,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                    fontSize = 15.sp,
+                    fontSize = 20.sp,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
