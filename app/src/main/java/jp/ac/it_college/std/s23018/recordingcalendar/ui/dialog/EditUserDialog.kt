@@ -18,11 +18,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontSynthesis.Companion.Weight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jp.ac.it_college.std.s23018.recordingcalendar.R
 
 @Composable
 fun EditUserDialog(
@@ -39,7 +41,7 @@ fun EditUserDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "ユーザー情報を編集") },
+        title = { Text(stringResource(id = R.string.edit_user)) },
         text = {
             Column(
                 modifier = Modifier
@@ -49,7 +51,7 @@ fun EditUserDialog(
                 OutlinedTextField(
                     value = inputName,
                     onValueChange = {inputName = it},
-                    label = {Text("名前を入力")},
+                    label = {Text(stringResource(id = R.string.input_name))},
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -68,7 +70,7 @@ fun EditUserDialog(
                                 inputWeight = newValue
                             }
                         },
-                        label = { Text("体重を入力") },
+                        label = { Text(stringResource(id = R.string.input_weight)) },
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                         modifier = Modifier.weight(1f)
                     )
@@ -95,7 +97,7 @@ fun EditUserDialog(
                                     inputTargetWeight = newValue
                                 }
                             },
-                            label = { Text("目標体重を入力") },
+                            label = { Text(stringResource(id = R.string.input_target)) },
                             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                             modifier = Modifier.weight(1f)
                         )
@@ -117,12 +119,12 @@ fun EditUserDialog(
                     onConfirm(inputName, weight, targetWeight)
                 }
             }) {
-                Text(text = "保存")
+                Text(stringResource(id = R.string.save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "キャンセル")
+                Text(stringResource(id = R.string.cancel))
             }
         }
     )

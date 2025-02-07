@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -53,6 +54,7 @@ fun UserScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val context = LocalContext.current
+    val update_message = stringResource(id = R.string.update_user)
 
     var showEditUserDialog by remember { mutableStateOf(false) }
 
@@ -72,9 +74,6 @@ fun UserScreen(
     LaunchedEffect(Unit) {
         refreshData()
     }
-
-
-
 
     Scaffold(
         topBar = {
@@ -115,18 +114,14 @@ fun UserScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    """
-                                        名前:
-                                            
-                                        現在の体重:
-                                        
-                                        目標体重:
-                                        
-                                    """.trimIndent(),
+                                    text = buildAnnotatedString {
+                                        append(stringResource(R.string.name) + ":\n\n")
+                                        append(stringResource(R.string.weight) + ":\n\n")
+                                        append(stringResource(R.string.target) + ":\n\n")
+                                    },
                                     fontSize = 25.sp,
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier
-                                        .padding(top = 15.dp)
+                                    modifier = Modifier.padding(top = 15.dp)
                                 )
                                 Text(
                                     """
@@ -153,7 +148,7 @@ fun UserScreen(
                                 horizontalArrangement = Arrangement.End
                             ) {
                                 Text(
-                                    text = "編集する",
+                                    stringResource(id = R.string.edit),
                                     fontSize = 15.sp,
                                     color = Color.Gray,
                                     modifier = Modifier
@@ -177,7 +172,7 @@ fun UserScreen(
                                                 )
                                                 Toast.makeText(
                                                     context,
-                                                    "ユーザー情報を更新しました",
+                                                    update_message,
                                                     Toast.LENGTH_SHORT
                                                 ).show()
                                                 refreshData()

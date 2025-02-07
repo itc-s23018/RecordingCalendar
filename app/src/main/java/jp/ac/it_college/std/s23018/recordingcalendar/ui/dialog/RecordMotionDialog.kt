@@ -32,28 +32,36 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jp.ac.it_college.std.s23018.recordingcalendar.R
 
 @Composable
 fun RecordMotionDialog(
     onConfirm: (String, Int) -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier,
-    motions: List<String> = listOf("Running", "Swimming", "Cycling", "Yoga")
+    motions: List<String> = listOf("running", "swimming", "cycling", "yoga")
 ) {
+    // システム言語によって表示を変更
+    val motionNameMap = mapOf(
+        "running" to stringResource(id = R.string.running),
+        "swimming" to stringResource(id = R.string.swimming),
+        "cycling" to stringResource(id = R.string.cycling),
+        "yoga" to stringResource(id = R.string.yoga)
+    )
+
     var selectedMotion by remember { mutableStateOf("") }
     var selectedTime by remember { mutableStateOf("") }
     var showMotionDropdown by remember { mutableStateOf(false) }
 
-
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "運動記録を入力") },
+        title = { Text(stringResource(id = R.string.record_motion)) },
         text = {
             Column(
                 modifier = Modifier
@@ -63,7 +71,7 @@ fun RecordMotionDialog(
                 // 運動を選択
                 Box {
                     OutlinedTextField(
-                        value = if (selectedMotion.isEmpty()) "運動を選択" else selectedMotion,
+                        value = if (selectedMotion.isEmpty()) stringResource(id = R.string.select_motion) else motionNameMap[selectedMotion] ?: selectedMotion,
                         onValueChange = {},
                         readOnly = true,
                         modifier = Modifier
@@ -84,16 +92,15 @@ fun RecordMotionDialog(
                             DropdownMenuItem(
                                 onClick = {
                                     selectedMotion = motion
-                                    showMotionDropdown = false // 選択後に閉じる
+                                    showMotionDropdown = false
                                 },
-                                text = { Text(motion) }
+                                text = { Text(motionNameMap[motion] ?: motion) }
                             )
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -106,36 +113,37 @@ fun RecordMotionDialog(
                                 selectedTime = newValue
                             }
                         },
-                        label = { Text("時間を入力") },
+                        label = { Text(stringResource(id = R.string.input_time)) },
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                         modifier = Modifier.weight(1f)
                     )
 
-                        Text(
-                            text = "分",
-                            modifier = Modifier.padding(start = 8.dp),
-                            fontSize = 15.sp
-                        )
-
+                    Text(
+                        text = stringResource(id = R.string.time),
+                        modifier = Modifier.padding(start = 8.dp),
+                        fontSize = 15.sp
+                    )
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = {
                 if (selectedMotion.isNotEmpty() && selectedTime.isNotEmpty()) {
+                    // 保存時には英語名を使用
                     onConfirm(selectedMotion, selectedTime.toInt())
                 }
             }) {
-                Text(text = "保存")
+                Text(stringResource(id = R.string.save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "キャンセル")
+                Text(stringResource(id = R.string.cancel))
             }
         }
     )
 }
+
 
 @Preview(showBackground = true)
 @Composable

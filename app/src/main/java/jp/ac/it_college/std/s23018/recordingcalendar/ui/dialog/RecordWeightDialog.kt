@@ -16,10 +16,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jp.ac.it_college.std.s23018.recordingcalendar.R
 
 @Composable
 fun RecordWeightDialog(
@@ -32,7 +34,7 @@ fun RecordWeightDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "体重記録を入力") },
+        title = { Text(stringResource(id = R.string.record_weight)) },
         text = {
             Column(
                 modifier = Modifier
@@ -50,7 +52,7 @@ fun RecordWeightDialog(
                                inputWeight = newValue
                            }
                        },
-                       label = { Text("体重を入力") },
+                       label = { Text(stringResource(id = R.string.input_weight)) },
                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                        modifier = Modifier.weight(1f)
                    )
@@ -69,12 +71,12 @@ fun RecordWeightDialog(
                   onConfirm(inputWeight.toFloat())
                 }
             }) {
-                Text(text = "保存")
+                Text(text = stringResource(id = R.string.save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "キャンセル")
+                Text(text = stringResource(id = R.string.cancel))
             }
         }
     )

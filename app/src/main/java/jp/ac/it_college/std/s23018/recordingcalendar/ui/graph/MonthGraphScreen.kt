@@ -42,6 +42,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
+import java.util.Locale
 
 @Composable
 fun MonthGraphScreen(
@@ -50,6 +51,8 @@ fun MonthGraphScreen(
 ) {
 
     var selectedMonth by remember { mutableStateOf(LocalDate.now()) }
+
+    val locale = Locale.getDefault()
 
     //月の最初の月曜日を取得
     val firstDayOfMonth = selectedMonth.withDayOfMonth(1)
@@ -101,8 +104,14 @@ fun MonthGraphScreen(
         IconButton(onClick = { selectedMonth = selectedMonth.minusMonths(1) }) {
             Icon(imageVector = Icons.Default.ChevronLeft, contentDescription = "Previous Month")
         }
+        val formattedDate = if (locale.language == Locale.JAPANESE.language) {
+            selectedMonth.format(DateTimeFormatter.ofPattern("yyyy年 M月").withLocale(locale))
+        } else {
+            selectedMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy").withLocale(locale))
+        }
+
         Text(
-            text = "${selectedMonth.year}年 ${selectedMonth.monthValue}月",
+            text = formattedDate,
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold

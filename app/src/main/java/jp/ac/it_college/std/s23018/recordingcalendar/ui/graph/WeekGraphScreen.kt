@@ -42,6 +42,8 @@ import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 @Composable
 fun WeekGraphScreen(
@@ -49,20 +51,18 @@ fun WeekGraphScreen(
     userInformation: UserEntity? = null
 ) {
 
+    val locale = Locale.getDefault()
+
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
 
     val startOfWeek = selectedDate.with(DayOfWeek.MONDAY)
     val endOfWeek = startOfWeek.plusDays(6)
 
     // ユーザー情報の体重情報を取得
-    var userInfo by remember {
-        mutableStateOf(userInformation)
-    }
+    var userInfo by remember { mutableStateOf(userInformation) }
 
-    //記録画面に記録されている体重データ
-    var weights by remember {
-        mutableStateOf<List<WeightEntity>>(emptyList())
-    }
+    // 記録画面に記録されている体重データ
+    var weights by remember { mutableStateOf<List<WeightEntity>>(emptyList()) }
 
     val app = navController.context.applicationContext as RecordingCalendarApplication
     val user_db = app.container.userRepository
@@ -93,58 +93,49 @@ fun WeekGraphScreen(
 
     // 週の日付表示
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = {
-            selectedDate = selectedDate.minusWeeks(1)
-        }) {
-            Icon(
-                imageVector = Icons.Default.ChevronLeft,
-                contentDescription = "Previous Week"
-            )
+        IconButton(onClick = { selectedDate = selectedDate.minusWeeks(1) }) {
+            Icon(imageVector = Icons.Default.ChevronLeft, contentDescription = "Previous Week")
         }
 
         Text(
-            text = "${startOfWeek.format(DateTimeFormatter.ofPattern("M月d日"))}〜${endOfWeek.format(DateTimeFormatter.ofPattern("M月d日"))}",
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Bold
-            )
+            text = "${startOfWeek.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale))} 〜 " +
+                    endOfWeek.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)),
+            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 25.sp, fontWeight = FontWeight.Bold)
         )
-        IconButton(onClick = {
-            selectedDate = selectedDate.plusWeeks(1)
-        }) {
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = "Next Week"
-            )
+
+        IconButton(onClick = { selectedDate = selectedDate.plusWeeks(1) }) {
+            Icon(imageVector = Icons.Default.ChevronRight, contentDescription = "Next Week")
         }
     }
 
     // 体重の軸
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        modifier = Modifier.fillMaxSize().padding(16.dp)
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
 
             // 横軸（曜日）
             val xAxisStart = Offset(90f, size.height - 100f)
             val xAxisEnd = Offset(size.width - 40f, size.height - 100f)
-            drawLine(
-                color = Color.Black,
-                start = xAxisStart,
-                end = xAxisEnd,
-                strokeWidth = 5f
-            )
+            drawLine(color = Color.Black, start = xAxisStart, end = xAxisEnd, strokeWidth = 5f)
 
-            val daysOfWeek = listOf("月", "火", "水", "木", "金", "土", "日")
+            // 週の日付リストを生成
+            val dateRange = generateSequence(startOfWeek) { it.plusDays(1) }
+                .takeWhile { !it.isAfter(endOfWeek) }
+                .toList()
+
+            // ロケールに応じた曜日リストを生成
+            val daysOfWeek = dateRange.map { date ->
+                date.format(DateTimeFormatter.ofPattern("E", locale))
+            }
+
             val xStep = (size.width - 100) / daysOfWeek.size
             val offset = xStep / 2
+
             daysOfWeek.forEachIndexed { index, day ->
                 val xPos = 90f + xStep * index + offset
                 val textColor = when (index) {
@@ -169,19 +160,11 @@ fun WeekGraphScreen(
             // 縦軸（体重）
             val yAxisStart = Offset(95f, 100f)
             val yAxisEnd = Offset(95f, size.height - 100f)
-            drawLine(
-                color = Color.Black,
-                start = yAxisStart,
-                end = yAxisEnd,
-                strokeWidth = 5f
-            )
-
+            drawLine(color = Color.Black, start = yAxisStart, end = yAxisEnd, strokeWidth = 5f)
 
             val weightMax = ((userInfo?.weight ?: 0f) + 2f).toFloat()
             val weightMin = ((userInfo?.weight ?: 0f) - 2f).toFloat()
             val weightRange = weightMax - weightMin
-
-
             val yStepHeight = (yAxisEnd.y - yAxisStart.y) / weightRange
 
             for (i in 0..(weightRange.toInt())) {
@@ -201,12 +184,7 @@ fun WeekGraphScreen(
             }
 
             // 体重データを曜日に合わせて表示
-            val dateRange = generateSequence(startOfWeek) { it.plusDays(1) }
-                .takeWhile { !it.isAfter(endOfWeek) }
-                .toList()
-
             val weightMap = weights.associateBy { LocalDate.parse(it.date) }
-
             val datas = mutableListOf<Offset>()
 
             dateRange.forEachIndexed { index, date ->
@@ -236,7 +214,6 @@ fun WeekGraphScreen(
                     center = Offset(xPos, weightYPos)
                 )
 
-                // 体重の数値を表示
                 val weightText = if (weightEntity != null) {
                     " ${"%.1f".format(weightAsFloat)}"
                 } else {
@@ -255,14 +232,8 @@ fun WeekGraphScreen(
 
                 if (datas.size > 1) {
                     val previousPoint = datas[datas.size - 2]
-                    drawLine(
-                        color = Color.Black,
-                        start = previousPoint,
-                        end = point,
-                        strokeWidth = 5f
-                    )
+                    drawLine(color = Color.Black, start = previousPoint, end = point, strokeWidth = 5f)
                 }
-
             }
         }
     }

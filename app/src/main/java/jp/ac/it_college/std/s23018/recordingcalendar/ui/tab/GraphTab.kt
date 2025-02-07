@@ -18,10 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jp.ac.it_college.std.s23018.recordingcalendar.R
 
 @Composable
 fun GraphTab(
@@ -29,7 +31,11 @@ fun GraphTab(
     onTabSelected: (Int) -> Unit
     ) {
 
-    val tabTitles = listOf("週", "月", "年")
+    val tabTitles = listOf(
+        stringResource(id = R.string.week),
+        stringResource(id = R.string.month),
+        stringResource(id = R.string.year),
+        )
     val backgroundColor = Color(0xFFD3D3D3)
     val selectedColor = Color.White
     val unselectedTabColor = Color.Black
@@ -39,7 +45,7 @@ fun GraphTab(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = 13.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(backgroundColor)
             .padding(4.dp),
@@ -53,14 +59,14 @@ fun GraphTab(
                     .clip(RoundedCornerShape(16.dp))
                     .background(if (isSelected) selectedColor else Color.Transparent)
                     .clickable { onTabSelected(index) }
-                    .padding(horizontal = 40.dp, vertical = 10.dp),
+                    .padding(horizontal = 30.dp, vertical = 10.dp),
                 contentAlignment = Alignment.Center
             ){
                 Text(
                     text = title,
                     color = if(isSelected) selectedTextColor else unselectedTabColor,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                    fontSize = 18.sp,
+                    fontSize = 15.sp,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }

@@ -61,15 +61,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.DateFormatSymbols
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 
 @Composable
 fun CalendarScreen(
-    navigateRecordEntry: () -> Unit = {},
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
+
     // 現在の日付を取得
     val currentCalendar = Calendar.getInstance()
     val initialYear = currentCalendar.get(Calendar.YEAR)
@@ -82,6 +83,14 @@ fun CalendarScreen(
     // システムのロケールを取得
     val currentLocale = Locale.getDefault()
     val isEnglish = currentLocale.language == "en"
+
+    val formattedDate = if (currentLocale.language == Locale.JAPANESE.language) {
+        // 日本語の場合
+        DateTimeFormatter.ofPattern("yyyy年 M月").withLocale(currentLocale).format(LocalDate.of(currentYear, currentMonth, 1))
+    } else {
+        // 英語などその他のロケールの場合
+        DateTimeFormatter.ofPattern("MMMM yyyy").withLocale(currentLocale).format(LocalDate.of(currentYear, currentMonth, 1))
+    }
 
     // 曜日のリストを取得
     val weekDays = if (isEnglish) {
@@ -128,10 +137,10 @@ fun CalendarScreen(
 
     //運動名をアイコンで表示させる
     val motionsIcons = mapOf(
-        "Running" to Icons.Default.DirectionsRun,
-        "Swimming" to Icons.Default.Pool,
-        "Cycling" to Icons.Default.DirectionsBike,
-        "Yoga" to Icons.Default.SelfImprovement
+        "running" to Icons.Default.DirectionsRun,
+        "swimming" to Icons.Default.Pool,
+        "cycling" to Icons.Default.DirectionsBike,
+        "yoga" to Icons.Default.SelfImprovement
     )
 
     //ユーザー登録
@@ -141,6 +150,7 @@ fun CalendarScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val user_db = app.container.userRepository
+    val message = context.getString(R.string.input_user)
 
     fun handleUserConfirm(name: String, weight: Float, targetWeight: Float) {
         coroutineScope.launch {
@@ -151,7 +161,7 @@ fun CalendarScreen(
                     targetWeight = targetWeight
                 )
             )
-            Toast.makeText(context, "ユーザー情報を登録しました", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             showUserInputDialog = false
         }
     }
@@ -218,12 +228,11 @@ fun CalendarScreen(
                     )
                 }
                 Text(
-                    text = "$currentYear 年 $currentMonth 月",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = 24.sp,
+                    text = formattedDate,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 25.sp,
                         fontWeight = FontWeight.Bold
-                    ),
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    )
                 )
                 IconButton(onClick = {
                     if (currentMonth == 12) {
@@ -255,7 +264,7 @@ fun CalendarScreen(
                     Text(
                         text = day,
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = textColor
                         ),
@@ -378,9 +387,10 @@ fun CalendarScreen(
                                                         }
                                                     }
                                                     Text(
-                                                        text = "${motionRecordsForDay.time}分",
+                                                        text = "${motionRecordsForDay.time} " + stringResource(id= R.string.time),
                                                         style = MaterialTheme.typography.bodySmall.copy(
-                                                            fontSize = 13.sp
+                                                            fontSize = 15.sp,
+                                                            fontWeight = FontWeight.Bold
                                                         )
                                                     )
                                                 }

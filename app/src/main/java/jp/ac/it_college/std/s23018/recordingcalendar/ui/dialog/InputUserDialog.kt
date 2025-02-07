@@ -18,10 +18,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jp.ac.it_college.std.s23018.recordingcalendar.R
 
 @Composable
 fun InputUserDialog(
@@ -36,7 +38,7 @@ fun InputUserDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "ユーザー情報を入力") },
+        title = { Text(stringResource(id = R.string.input_user)) },
         text = {
             Column(
                 modifier = Modifier
@@ -46,7 +48,7 @@ fun InputUserDialog(
                 OutlinedTextField(
                     value = inputName,
                     onValueChange = {inputName = it},
-                    label = {Text("名前を入力")},
+                    label = {Text(stringResource(id = R.string.input_name))},
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -65,7 +67,7 @@ fun InputUserDialog(
                                 inputWeight = newValue
                             }
                         },
-                        label = { Text("現在の体重を入力") },
+                        label = { Text(stringResource(R.string.input_weight)) },
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                         modifier = Modifier.weight(1f)
                     )
@@ -89,7 +91,7 @@ fun InputUserDialog(
                                 inputTargetWeight = newValue
                             }
                         },
-                        label = { Text("目標体重を入力") },
+                        label = { Text(stringResource(id = R.string.input_target)) },
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                         modifier = Modifier.weight(1f)
                     )
@@ -109,12 +111,12 @@ fun InputUserDialog(
                     onConfirm(inputName, inputWeight.toFloat(), inputTargetWeight.toFloat())
                 }
             }) {
-                Text(text = "保存")
+                Text(stringResource(id = R.string.save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "キャンセル")
+                Text(stringResource(id = R.string.cancel))
             }
         }
     )

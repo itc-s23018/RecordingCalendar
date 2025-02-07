@@ -11,7 +11,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import jp.ac.it_college.std.s23018.recordingcalendar.R
 
 @Composable
 fun DeleteMotionDialog(
@@ -22,22 +24,22 @@ fun DeleteMotionDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = "確認")
+            Text(stringResource(R.string.confirmation))
         },
         text = {
-            Text(text = "この運動記録を削除してもよろしいですか？")
+            Text(stringResource(R.string.check_delete))
         },
         confirmButton = {
             TextButton( onClick = {
                 onConfirm()
             }) {
-                Text(text = "削除")
+                Text(stringResource(id = R.string.delete))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss
             ) {
-                Text(text = "キャンセル")
+                Text(stringResource(id = R.string.cancel))
             }
         })
 }

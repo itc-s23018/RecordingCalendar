@@ -26,26 +26,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jp.ac.it_college.std.s23018.recordingcalendar.R
 
 @Composable
 fun EditMotionDialog(
     onConfirm: (String, Int) -> Unit,
     onDismiss: () -> Unit,
-    motions: List<String> = listOf("Running", "Swimming", "Cycling", "Yoga"),
+    motions: List<String> = listOf("running", "swimming", "cycling", "yoga"),
     initialMotion: String = "",
     initialTime: Int = 0
 ) {
+
+    val motionNameMap = mapOf(
+        "running" to stringResource(id = R.string.running),
+        "swimming" to stringResource(id = R.string.swimming),
+        "cycling" to stringResource(id = R.string.cycling),
+        "yoga" to stringResource(id = R.string.yoga)
+    )
+
     var selectedMotion by remember { mutableStateOf(initialMotion) }
     var selectedTime by remember { mutableStateOf(initialTime.toString()) }
     var showMotionDropdown by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "運動記録を編集") },
+        title = { Text(stringResource(id = R.string.edit_motion)) },
         text = {
             Column(
                 modifier = Modifier
@@ -55,7 +65,7 @@ fun EditMotionDialog(
                 // 運動を選択
                 Box {
                     OutlinedTextField(
-                        value = if (selectedMotion.isEmpty()) "運動を選択" else selectedMotion,
+                        value = if (selectedMotion.isEmpty()) stringResource(id = R.string.select_motion) else motionNameMap[selectedMotion] ?: selectedMotion,
                         onValueChange = {},
                         readOnly = true,
                         modifier = Modifier
@@ -78,11 +88,12 @@ fun EditMotionDialog(
                                     selectedMotion = motion
                                     showMotionDropdown = false
                                 },
-                                text = { Text(motion) }
+                                text = { Text(motionNameMap[motion] ?: motion) }
                             )
                         }
                     }
                 }
+
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -98,13 +109,13 @@ fun EditMotionDialog(
                                 selectedTime = newValue
                             }
                         },
-                        label = { Text("時間を入力") },
+                        label = { stringResource(id = R.string.input_time) },
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                         modifier = Modifier.weight(1f)
                     )
 
                     Text(
-                            text = "分",
+                            text = stringResource(id = R.string.time),
                             modifier = Modifier.padding(start = 8.dp),
                             fontSize = 15.sp
                         )
@@ -118,12 +129,12 @@ fun EditMotionDialog(
                     onConfirm(selectedMotion, selectedTime.toInt())
                 }
             }) {
-                Text(text = "保存")
+                Text(stringResource( R.string.save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "キャンセル")
+                Text(stringResource(R.string.cancel) )
             }
         }
     )

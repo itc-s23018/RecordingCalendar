@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,6 +53,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,6 +94,12 @@ fun RecordScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val context = LocalContext.current
+
+    val weight_message = context.getString(R.string.add_weight)
+    val motion_message = context.getString(R.string.add_motion)
+    val update_weight_message = context.getString(R.string.update_weight)
+    val update_motion_message = context.getString(R.string.update_motion)
+    val delete_motion_message = context.getString(R.string.delete_motion)
 
     var showAddWeightDialog by remember { mutableStateOf(false) }
 
@@ -134,7 +142,7 @@ fun RecordScreen(
                     weight = weight
                 )
             )
-            Toast.makeText(context, "体重記録を追加しました", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, weight_message, Toast.LENGTH_SHORT).show()
             refreshData()
         }
         showAddWeightDialog  = false
@@ -149,7 +157,7 @@ fun RecordScreen(
                     time = time
                 )
             )
-            Toast.makeText(context,"運動記録を追加しました", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context,motion_message, Toast.LENGTH_SHORT).show()
             refreshData()
         }
         showAddMotionDialog = false
@@ -189,9 +197,12 @@ fun RecordScreen(
                             contentDescription = "Previous Date"
                         )
                     }
+                    val locale = context.resources.configuration.locales.get(0)
 
                     Text(
-                        text = selectedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                        text = selectedDate.format(
+                            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
+                        ),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontSize = 25.sp,
                             fontWeight = FontWeight.Bold
@@ -215,12 +226,12 @@ fun RecordScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "歩数:",
+                        stringResource(id = R.string.steps) + ":",
                         fontSize = 25.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "${stepRecord?.step ?: 0}歩",
+                        text = "${stepRecord?.step ?: 0}"+ stringResource(id = R.string.step),
                         fontSize = 30.sp,
                         modifier = Modifier.padding(end = 10.dp),
                         fontWeight = FontWeight.Bold
@@ -243,7 +254,7 @@ fun RecordScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                "体重:",
+                                 stringResource(R.string.weight) +":",
                                 fontSize = 25.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -263,7 +274,7 @@ fun RecordScreen(
                         ) {
 
                             Text(
-                                text = "編集する",
+                                text = stringResource(id = R.string.edit),
                                 fontSize = 15.sp,
                                 color = Color.Gray,
                                 modifier = Modifier
@@ -281,7 +292,7 @@ fun RecordScreen(
                                             db.updateWeight(
                                                 weightToEdit!!.copy(weight = weight)
                                             )
-                                            Toast.makeText(context,"体重記録を更新しました", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context,update_weight_message, Toast.LENGTH_SHORT).show()
                                             refreshData()
                                         }
                                         showEditWeightDialog = false
@@ -298,7 +309,7 @@ fun RecordScreen(
                     )
                 } ?: run {
                     Text(
-                        text = "体重: 記録なし",
+                        text = stringResource(id = R.string.weight) + ":" + stringResource(id = R.string.no_record),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
@@ -306,7 +317,7 @@ fun RecordScreen(
                         modifier = Modifier.padding(top = 16.dp)
                     )
                     Text(
-                        text = "登録する",
+                        text = stringResource(id = R.string.recording),
                         color = Color.Gray,
                         modifier = Modifier
                             .clickable {
@@ -339,17 +350,23 @@ fun RecordScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Text(
+                                        stringResource(R.string.motion_record) +
                                         """
-                                            運動記録:
+                                           :
                                         """.trimIndent(),
                                         fontSize = 25.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier
                                             .padding(top = 15.dp)
                                     )
+
+                                    val motionNameResourceId = context.resources.getIdentifier(
+                                            motion.name, "string", context.packageName)
+
                                     Text(
                                         """
-                                               ${motion.name}
+                                               ${if (motionNameResourceId != 0) 
+                                                   stringResource(id = motionNameResourceId) else motion.name}
                                             
                                                ${motion.time}分
                                         """.trimIndent(),
@@ -369,7 +386,7 @@ fun RecordScreen(
                                     horizontalArrangement = Arrangement.End
                                 ) {
                                     Text(
-                                        text = "編集する",
+                                        text = stringResource(R.string.edit),
                                         fontSize = 15.sp,
                                         color = Color.Gray,
                                         modifier = Modifier
@@ -387,7 +404,7 @@ fun RecordScreen(
                                                     db.updateMotion(
                                                         motionToEdit!!.copy(name = name, time = time)
                                                     )
-                                                    Toast.makeText(context, "運動記録を更新しました", Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(context, update_motion_message, Toast.LENGTH_SHORT).show()
                                                     refreshData()
                                                 }
                                                 showEditMotionDialog = false
@@ -400,9 +417,9 @@ fun RecordScreen(
 
 
                                     Text(
-                                        text = "削除する",
+                                        text = stringResource(R.string.delete),
                                         fontSize = 15.sp,
-                                        color = Color.Gray,
+                                        color = Color.Red,
                                         modifier = Modifier
                                             .padding(start = 5.dp)
                                             .clickable {
@@ -422,7 +439,7 @@ fun RecordScreen(
                                 coroutineScope.launch {
                                     db.deleteMotion(motionToDelete!!)
                                     refreshData()
-                                    Toast.makeText(context,"運動記録を削除しました",Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context,delete_motion_message,Toast.LENGTH_SHORT).show()
 
                                 }
                                 showDeleteMotionDialog = false
@@ -439,7 +456,7 @@ fun RecordScreen(
                         horizontalArrangement = Arrangement.End
                     ) {
                         Text(
-                            text = "追加する",
+                            text = stringResource(R.string.recording),
                             color = Color.Gray,
                             modifier = Modifier
                                 .clickable {
@@ -456,7 +473,7 @@ fun RecordScreen(
                     }
                 } else {
                     Text(
-                        text = "運動記録: なし",
+                        text =  stringResource(id= R.string.motion_record) +":" + stringResource(id= R.string.no_record),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
@@ -464,7 +481,7 @@ fun RecordScreen(
                         modifier = Modifier.padding(top = 16.dp)
                     )
                     Text(
-                        text = "記録する",
+                        text = stringResource(id = R.string.recording),
                         color = Color.Gray,
                         modifier = Modifier
                             .clickable {

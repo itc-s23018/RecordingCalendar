@@ -91,7 +91,7 @@ fun YearGraphScreen(
         }
 
         Text(
-            text = "${selectedYear.year} 年",
+            text = "${selectedYear.year}",
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
