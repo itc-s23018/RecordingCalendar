@@ -155,21 +155,22 @@ fun YearGraphScreen(
 
             val userWeight = (userInfo?.weight ?: 0f)
             val weightMax = userWeight + 2f
-            val weightMin =  userWeight - 2f
+            val weightMin = userWeight - 2f
             val weightRange = weightMax - weightMin
 
             val yStepHeight = (yAxisEnd.y - yAxisStart.y) / weightRange
 
             for (i in 0..(weightRange.toInt())) {
                 val weightLabel = weightMin + i
-                val yPos = yAxisEnd.y - (i * yStepHeight)
+                val yPos = yAxisEnd.y - (i / weightRange.toFloat()) * (yAxisEnd.y - yAxisStart.y)
 
                 drawContext.canvas.nativeCanvas.drawText(
                     "${weightLabel.toInt()}",
                     yAxisStart.x - 20f,
                     yPos,
                     android.graphics.Paint().apply {
-                        color = if (i == weightRange.toInt() / 2) Color.Blue.toArgb() else Color.Black.toArgb()
+                        color =
+                            if (i == weightRange.toInt() / 2) Color.Blue.toArgb() else Color.Black.toArgb()
                         textSize = 50f
                         textAlign = android.graphics.Paint.Align.RIGHT
                     }
@@ -182,32 +183,27 @@ fun YearGraphScreen(
             months.forEachIndexed { index, month ->
                 val xPos = 90f + xStep * index + offset
 
-               val monthWeights = weights.filter { weight ->
-                   val weightDate = LocalDate.parse(weight.date, DateTimeFormatter.ISO_DATE)
-                   weightDate.monthValue == month.toInt()
-               }
-
-               val averageWeight = if (monthWeights.isNotEmpty()) {
-                   monthWeights.map { it.weight }.average().toFloat()
-               } else {
-                   weightMin
-               }
-
-                val weightPos = when {
-                    averageWeight < weightMin -> 0.09f
-                    averageWeight > weightMax -> (weightMax - weightMin)
-                    else -> (averageWeight - weightMin)
+                val monthWeights = weights.filter { weight ->
+                    val weightDate = LocalDate.parse(weight.date, DateTimeFormatter.ISO_DATE)
+                    weightDate.monthValue == month.toInt()
                 }
 
-                val weightYPos = yAxisEnd.y - (weightPos * weightMin)
+                val averageWeight = if (monthWeights.isNotEmpty()) {
+                    monthWeights.map { it.weight }.average().toFloat()
+                } else {
+                    weightMin
+                }
+
+                val weightPos = (averageWeight - weightMin) / weightRange
+                val weightYPos = yAxisEnd.y - (weightPos * (yAxisEnd.y - yAxisStart.y))
 
                 val point = Offset(xPos, weightYPos)
                 datas.add(point)
 
                 drawCircle(
-                    color = if (!monthWeights.isNotEmpty()) Color.Gray else Color.Black,
+                    color = if (monthWeights.isEmpty()) Color.Gray else Color.Black,
                     radius = 20f,
-                    center = Offset(xPos, weightYPos)
+                    center = point
                 )
 
                 val weightText = if (monthWeights.isNotEmpty()) {
@@ -225,6 +221,7 @@ fun YearGraphScreen(
                         textAlign = android.graphics.Paint.Align.CENTER
                     }
                 )
+
                 if (datas.size > 1) {
                     val previousPoint = datas[datas.size - 2]
                     drawLine(
