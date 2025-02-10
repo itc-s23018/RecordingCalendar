@@ -37,16 +37,27 @@ import jp.ac.it_college.std.s23018.recordingcalendar.R
 fun EditMotionDialog(
     onConfirm: (String, Int) -> Unit,
     onDismiss: () -> Unit,
-    motions: List<String> = listOf("running", "swimming", "cycling", "yoga"),
+    motions: List<String> = listOf(
+        "walking", "running",  "cycling", //ウォーキング、ランニング、自転車
+        "yoga", "muscle_training", "swimming",//ヨガ、筋トレ、水泳
+        "basketball","baseball","soccer", // 野球、バスケ、サッカー
+        "golf",//ゴルフ
+    ),
     initialMotion: String = "",
     initialTime: Int = 0
 ) {
 
     val motionNameMap = mapOf(
+        "walking" to stringResource(id = R.string.walking),
         "running" to stringResource(id = R.string.running),
-        "swimming" to stringResource(id = R.string.swimming),
         "cycling" to stringResource(id = R.string.cycling),
-        "yoga" to stringResource(id = R.string.yoga)
+        "yoga" to stringResource(id = R.string.yoga),
+        "muscle_training" to stringResource(id = R.string.muscle_training),
+        "swimming" to stringResource(id = R.string.swimming),
+        "baseball" to stringResource(id = R.string.baseball),
+        "basketball" to stringResource(id = R.string.basketball),
+        "soccer" to stringResource(id = R.string.soccer),
+        "golf" to stringResource(id = R.string.golf),
     )
 
     var selectedMotion by remember { mutableStateOf(initialMotion) }
@@ -80,7 +91,8 @@ fun EditMotionDialog(
                     }
                     DropdownMenu(
                         expanded = showMotionDropdown,
-                        onDismissRequest = { showMotionDropdown = false }
+                        onDismissRequest = { showMotionDropdown = false },
+                        modifier = Modifier.height(150.dp)
                     ) {
                         motions.forEach { motion ->
                             DropdownMenuItem(

@@ -21,8 +21,14 @@ import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.DirectionsBike
 import androidx.compose.material.icons.filled.DirectionsRun
+import androidx.compose.material.icons.filled.DirectionsWalk
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Pool
 import androidx.compose.material.icons.filled.SelfImprovement
+import androidx.compose.material.icons.filled.SportsBaseball
+import androidx.compose.material.icons.filled.SportsBasketball
+import androidx.compose.material.icons.filled.SportsGolf
+import androidx.compose.material.icons.filled.SportsSoccer
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -137,10 +143,16 @@ fun CalendarScreen(
 
     //運動名をアイコンで表示させる
     val motionsIcons = mapOf(
+        "walking" to Icons.Default.DirectionsWalk,
         "running" to Icons.Default.DirectionsRun,
-        "swimming" to Icons.Default.Pool,
         "cycling" to Icons.Default.DirectionsBike,
-        "yoga" to Icons.Default.SelfImprovement
+        "yoga" to Icons.Default.SelfImprovement,
+        "muscle_training" to Icons.Default.FitnessCenter,
+        "swimming" to Icons.Default.Pool,
+        "baseball" to Icons.Default.SportsBaseball,
+        "basketball" to Icons.Default.SportsBasketball,
+        "soccer" to Icons.Default.SportsSoccer,
+        "golf" to Icons.Default.SportsGolf
     )
 
     //ユーザー登録

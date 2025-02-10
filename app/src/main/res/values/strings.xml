@@ -44,4 +44,9 @@
     <string name="month">Month</string>
     <string name="year">Year</string>
     <string name="update_user">Updated User information.</string>
+    <string name="muscle_training">Muscle Training</string>
+    <string name="golf">Golg</string>
+    <string name="baseball">BaseBall</string>
+    <string name="soccer">Soccer</string>
+    <string name="basketball">Basketball</string>
 </resources>
