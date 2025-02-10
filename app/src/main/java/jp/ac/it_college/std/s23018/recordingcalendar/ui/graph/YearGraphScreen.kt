@@ -192,7 +192,7 @@ fun YearGraphScreen(
                     monthWeights.map { it.weight }.average().toFloat()
                 } else {
                     weightMin
-                }
+                }.coerceIn(weightMin, weightMax)
 
                 val weightPos = (averageWeight - weightMin) / weightRange
                 val weightYPos = yAxisEnd.y - (weightPos * (yAxisEnd.y - yAxisStart.y))
