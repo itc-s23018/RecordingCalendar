@@ -62,7 +62,6 @@ import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.UserEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.data.entity.WeightEntity
 import jp.ac.it_college.std.s23018.recordingcalendar.ui.dialog.InputUserDialog
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.DateFormatSymbols
@@ -162,7 +161,7 @@ fun CalendarScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val user_db = app.container.userRepository
-    val message = context.getString(R.string.input_user)
+    val message = context.getString(R.string.inputed_user)
 
     fun handleUserConfirm(name: String, weight: Float, targetWeight: Float) {
         coroutineScope.launch {

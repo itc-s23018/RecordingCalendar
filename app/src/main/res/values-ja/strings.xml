@@ -26,7 +26,7 @@
     <string name="record_motion">運動記録を入力</string>
     <string name="time">分</string>
     <string name="edit_motion">運動記録を編集</string>
-    <string name="input_user">ユーザー情報を登録しました</string>
+    <string name="inputed_user">ユーザー情報を登録しました</string>
     <string name="add_weight">体重記録を追加しました</string>
     <string name="add_motion">運動記録を追加しました</string>
     <string name="update_weight">体重記録を更新しました</string>
@@ -50,4 +50,5 @@
     <string name="baseball">野球</string>
     <string name="soccer">サッカー</string>
     <string name="basketball">バスケ</string>
+    <string name="input_user">ユーザー情報を入力</string>
 </resources>
