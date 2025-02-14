@@ -104,7 +104,7 @@ fun WeekGraphScreen(
         Text(
             text = "${startOfWeek.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale))} 〜 " +
                     endOfWeek.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)),
-            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 25.sp, fontWeight = FontWeight.Bold)
+            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 20.sp)
         )
 
         IconButton(onClick = { selectedDate = selectedDate.plusWeeks(1) }) {
