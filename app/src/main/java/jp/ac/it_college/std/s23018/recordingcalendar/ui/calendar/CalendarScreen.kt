@@ -189,7 +189,6 @@ fun CalendarScreen(
     }
 
 
-
     Scaffold(
         topBar = { //トップバー
             Box(
@@ -288,19 +287,20 @@ fun CalendarScreen(
             }
 
             // 日付の表示
-            Spacer(modifier = Modifier.height(6.dp))
             val daysInWeek = 7
             val emptySlots = firstDayOfWeek - 1
+
+            Spacer(modifier = Modifier.height(0.dp)) // 高さを変更して余白を調整
 
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
                 for (week in 0..5) {
-                    if( week > 0){
+                    if (week > 0) {
                         Divider(
                             color = Color.Black,
                             thickness = 1.dp,
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 0.5.dp)
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 0.dp) // 上下の余白を減らす
                         )
                     }
                     Row(
@@ -320,16 +320,17 @@ fun CalendarScreen(
 
                                 Card(
                                     modifier = Modifier
-                                        .height(100.dp)
-                                        .width(55.dp)
-                                        .clickable { navController.navigate("record/$currentYear/$currentMonth/$currentDayInCell") }
+                                        .weight(1f)
+                                        .height(120.dp)
+                                        .clickable {
+                                            navController.navigate("record/$currentYear/$currentMonth/$currentDayInCell")
+                                        }
                                 ) {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxSize()
                                             .background(Color(0xFFF8F8FF))
                                     ) {
-
                                         Box(
                                             contentAlignment = Alignment.Center,
                                             modifier = Modifier
@@ -338,7 +339,7 @@ fun CalendarScreen(
                                                 .padding(start = 5.dp, top = 8.dp)
                                                 .background(
                                                     color = if (isToday) Color.Red else Color.Transparent,
-                                                    shape = CircleShape,
+                                                    shape = CircleShape
                                                 )
                                         ) {
                                             Text(
@@ -351,17 +352,16 @@ fun CalendarScreen(
                                             )
                                         }
 
-                                        val weightRecordForDay = weightRecords.value[LocalDate.of(currentYear,currentMonth,currentDayInCell)]
-                                        val motionRecordsForDay = motionsRecords.value[LocalDate.of(currentYear,currentMonth,currentDayInCell)]?.firstOrNull()
+                                        val weightRecordForDay = weightRecords.value[LocalDate.of(currentYear, currentMonth, currentDayInCell)]
+                                        val motionRecordsForDay = motionsRecords.value[LocalDate.of(currentYear, currentMonth, currentDayInCell)]?.firstOrNull()
 
                                         Column(
                                             modifier = Modifier
-                                                .align(Alignment.BottomCenter)
-                                                .padding(bottom = 8.dp),
+                                                .fillMaxSize(),
                                             horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.Bottom,
                                         ) {
                                             if (weightRecordForDay != null) {
-
                                                 Text(
                                                     text = "${weightRecordForDay.weight}Kg",
                                                     style = MaterialTheme.typography.bodySmall.copy(
@@ -369,17 +369,18 @@ fun CalendarScreen(
                                                         color = Color.White
                                                     ),
                                                     modifier = Modifier
-                                                        .background(Color(0xFF4169e1), shape = RoundedCornerShape(3.dp))
+                                                        .background(Color(0xFF4169e1), shape = RoundedCornerShape(6.dp))
                                                         .padding(4.dp)
                                                 )
                                             }
+                                            Spacer(modifier = Modifier.width(3.dp))
 
 
                                             if (motionRecordsForDay != null) {
                                                 Row(
                                                     modifier = Modifier
-                                                        .padding(top = 5.dp)
-                                                        .background(Color(0xFF00ff7f), shape = RoundedCornerShape(3.dp))
+                                                        .padding(top = 4.dp, bottom = 4.dp)
+                                                        .background(Color(0xFF00ff7f), shape = RoundedCornerShape(6.dp))
                                                 ) {
                                                     Box(
                                                         modifier = Modifier
@@ -387,26 +388,26 @@ fun CalendarScreen(
                                                             .background(Color.White, shape = CircleShape),
                                                         contentAlignment = Alignment.Center
                                                     ) {
-                                                        val motionIcon =
-                                                            motionsIcons[motionRecordsForDay.name]
+                                                        val motionIcon = motionsIcons[motionRecordsForDay.name]
                                                         if (motionIcon != null) {
                                                             Icon(
                                                                 imageVector = motionIcon,
                                                                 contentDescription = motionRecordsForDay.name,
-                                                                modifier = Modifier.size((15.dp))
+                                                                modifier = Modifier.size(15.dp)
                                                             )
                                                         }
                                                     }
                                                     Text(
                                                         text = "${motionRecordsForDay.time} " + stringResource(id= R.string.time),
                                                         style = MaterialTheme.typography.bodySmall.copy(
-                                                            fontSize = 15.sp,
+                                                            fontSize = 12.sp,
                                                             fontWeight = FontWeight.Bold
                                                         )
                                                     )
                                                 }
                                             }
                                         }
+                                        Spacer(modifier = Modifier.width(5.dp))
                                     }
                                 }
                             } else {
@@ -416,7 +417,7 @@ fun CalendarScreen(
                     }
 
                     if (week * daysInWeek + emptySlots < daysInMonth) {
-                        Spacer(modifier = Modifier.height(32.dp))
+                        Spacer(modifier = Modifier.height(0.dp)) // 高さを調整して余白を埋める
                     }
 
                     if (week * daysInWeek + emptySlots >= daysInMonth) {
@@ -424,6 +425,7 @@ fun CalendarScreen(
                     }
                 }
             }
+
         }
     }
 }
