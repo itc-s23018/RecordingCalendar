@@ -40,7 +40,7 @@ fun TabRowView(
                 selected = tabIndex == index,
                 onClick = { onTabChange(index) },
                 text = { Text(text = label,
-                    fontSize = 20.sp) },
+                    fontSize = 18.sp) },
                 icon = {
                    Icon(
                       imageVector = icon,
