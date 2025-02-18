@@ -290,7 +290,6 @@ fun CalendarScreen(
             val daysInWeek = 7
             val emptySlots = firstDayOfWeek - 1
 
-            Spacer(modifier = Modifier.height(0.dp)) // 高さを変更して余白を調整
 
             Column(
                 modifier = Modifier.fillMaxSize()
@@ -359,7 +358,7 @@ fun CalendarScreen(
                                             modifier = Modifier
                                                 .fillMaxSize(),
                                             horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.Bottom,
+                                            verticalArrangement = Arrangement.Center,
                                         ) {
                                             if (weightRecordForDay != null) {
                                                 Text(
@@ -372,9 +371,8 @@ fun CalendarScreen(
                                                         .background(Color(0xFF4169e1), shape = RoundedCornerShape(6.dp))
                                                         .padding(4.dp)
                                                 )
+                                                Spacer(modifier = Modifier.width(3.dp))
                                             }
-                                            Spacer(modifier = Modifier.width(3.dp))
-
 
                                             if (motionRecordsForDay != null) {
                                                 Row(
@@ -386,7 +384,7 @@ fun CalendarScreen(
                                                         modifier = Modifier
                                                             .size(18.dp)
                                                             .background(Color.White, shape = CircleShape),
-                                                        contentAlignment = Alignment.Center
+                                                        contentAlignment = Alignment.Center,
                                                     ) {
                                                         val motionIcon = motionsIcons[motionRecordsForDay.name]
                                                         if (motionIcon != null) {
@@ -404,10 +402,10 @@ fun CalendarScreen(
                                                             fontWeight = FontWeight.Bold
                                                         )
                                                     )
+                                                    Spacer(modifier = Modifier.width(10.dp))
                                                 }
                                             }
                                         }
-                                        Spacer(modifier = Modifier.width(5.dp))
                                     }
                                 }
                             } else {
